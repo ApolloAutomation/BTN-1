@@ -5,12 +5,224 @@ esphome:
   name_add_mac_suffix: true
   platformio_options:
     board_build.flash_mode: dio
+    board_build.flash_size: 8MB
 
   project:
     name: "ApolloAutomation.BTN-1"
     version: "${version}"
 
   min_version: 2023.11.1
+
+  # Wake-up detection logic
+  on_boot:
+    priority: -100
+    then:
+      - lambda: |-
+          ESP_LOGD("BTN-1", "=== Starting on_boot wake-up detection ===");
+          
+          uint64_t wake = esp_sleep_get_ext1_wakeup_status();
+          uint32_t low = wake % 0xFFFFFFFF;
+          uint32_t high = (wake >> 32) % 0xFFFFFFFF;
+          
+          // Log raw wake status values
+          ESP_LOGD("BTN-1", "Raw wake status (uint64_t): 0x%016llX", wake);
+          ESP_LOGD("BTN-1", "Wake status low (uint32_t): 0x%08X", low);
+          ESP_LOGD("BTN-1", "Wake status high (uint32_t): 0x%08X", high);
+          
+          // Log individual GPIO bit checks
+          ESP_LOGD("BTN-1", "GPIO2 bit check: (low & (1<<2)) = 0x%08X", (low & (1<<2)));
+          ESP_LOGD("BTN-1", "GPIO4 bit check: (low & (1<<4)) = 0x%08X", (low & (1<<4)));
+          ESP_LOGD("BTN-1", "GPIO5 bit check: (low & (1<<5)) = 0x%08X", (low & (1<<5)));
+          ESP_LOGD("BTN-1", "GPIO6 bit check: (low & (1<<6)) = 0x%08X", (low & (1<<6)));
+          
+          // Check which GPIO pin caused the wake-up
+          if ((low) & (1<<(2))) {
+            ESP_LOGD("BTN-1", "Detected wake-up from GPIO2 (Button 1)");
+            id(wakeup_gpio_pin) = 2;
+            id(wakeup_button_sensor).publish_state("Button 1 (GPIO2)");
+            id(wakeup_pin_sensor).publish_state(2);
+            ESP_LOGD("BTN-1", "Set wakeup_gpio_pin to: %d", id(wakeup_gpio_pin));
+          }
+          else if ((low) & (1<<(4))) {
+            ESP_LOGD("BTN-1", "Detected wake-up from GPIO4 (Button 2)");
+            id(wakeup_gpio_pin) = 4;
+            id(wakeup_button_sensor).publish_state("Button 2 (GPIO4)");
+            id(wakeup_pin_sensor).publish_state(4);
+            ESP_LOGD("BTN-1", "Set wakeup_gpio_pin to: %d", id(wakeup_gpio_pin));
+          }
+          else if ((low) & (1<<(5))) {
+            ESP_LOGD("BTN-1", "Detected wake-up from GPIO5 (Button 3)");
+            id(wakeup_gpio_pin) = 5;
+            id(wakeup_button_sensor).publish_state("Button 3 (GPIO5)");
+            id(wakeup_pin_sensor).publish_state(5);
+            ESP_LOGD("BTN-1", "Set wakeup_gpio_pin to: %d", id(wakeup_gpio_pin));
+          }
+          else if ((low) & (1<<(6))) {
+            ESP_LOGD("BTN-1", "Detected wake-up from GPIO6 (Button 4)");
+            id(wakeup_gpio_pin) = 6;
+            id(wakeup_button_sensor).publish_state("Button 4 (GPIO6)");
+            id(wakeup_pin_sensor).publish_state(6);
+            ESP_LOGD("BTN-1", "Set wakeup_gpio_pin to: %d", id(wakeup_gpio_pin));
+          }
+          else {
+            ESP_LOGD("BTN-1", "No button wake-up detected - wake status might be 0 or from another source");
+            id(wakeup_gpio_pin) = 0;
+            id(wakeup_button_sensor).publish_state("No button wake-up detected");
+            id(wakeup_pin_sensor).publish_state(0);
+            ESP_LOGD("BTN-1", "Set wakeup_gpio_pin to: %d (no button)", id(wakeup_gpio_pin));
+          }
+          
+          ESP_LOGD("BTN-1", "=== Wake-up detection complete, proceeding to LED patterns ===");
+      
+      # Show LED color based on wake-up source
+      - if:
+          condition:
+            lambda: |-
+              ESP_LOGD("BTN-1", "Checking if wakeup_gpio_pin == 2: %s", id(wakeup_gpio_pin) == 2 ? "true" : "false");
+              return id(wakeup_gpio_pin) == 2;
+          then:
+            # Button 1 - Red color
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Entering Button 1 (GPIO2) LED color - Red");
+                ESP_LOGD("BTN-1", "LED state before color: %s", id(status_led).current_values.is_on() ? "ON" : "OFF");
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 1: Turning LED ON with Red color");
+            - light.turn_on:
+                id: status_led
+                brightness: 100%
+                red: 100%
+                green: 0%
+                blue: 0%
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 1: LED should be Red now, displaying for 3 seconds");
+            - delay: 3s
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 1: Turning LED OFF");
+            - light.turn_off:
+                id: status_led
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 1 LED color complete");
+      - if:
+          condition:
+            lambda: |-
+              ESP_LOGD("BTN-1", "Checking if wakeup_gpio_pin == 4: %s", id(wakeup_gpio_pin) == 4 ? "true" : "false");
+              return id(wakeup_gpio_pin) == 4;
+          then:
+            # Button 2 - Green color
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Entering Button 2 (GPIO4) LED color - Green");
+                ESP_LOGD("BTN-1", "LED state before color: %s", id(status_led).current_values.is_on() ? "ON" : "OFF");
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 2: Turning LED ON with Green color");
+            - light.turn_on:
+                id: status_led
+                brightness: 100%
+                red: 0%
+                green: 100%
+                blue: 0%
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 2: LED should be Green now, displaying for 3 seconds");
+            - delay: 3s
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 2: Turning LED OFF");
+            - light.turn_off:
+                id: status_led
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 2 LED color complete");
+      - if:
+          condition:
+            lambda: |-
+              ESP_LOGD("BTN-1", "Checking if wakeup_gpio_pin == 5: %s", id(wakeup_gpio_pin) == 5 ? "true" : "false");
+              return id(wakeup_gpio_pin) == 5;
+          then:
+            # Button 3 - Blue color
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Entering Button 3 (GPIO5) LED color - Blue");
+                ESP_LOGD("BTN-1", "LED state before color: %s", id(status_led).current_values.is_on() ? "ON" : "OFF");
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 3: Turning LED ON with Blue color");
+            - light.turn_on:
+                id: status_led
+                brightness: 100%
+                red: 0%
+                green: 0%
+                blue: 100%
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 3: LED should be Blue now, displaying for 3 seconds");
+            - delay: 3s
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 3: Turning LED OFF");
+            - light.turn_off:
+                id: status_led
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 3 LED color complete");
+      - if:
+          condition:
+            lambda: |-
+              ESP_LOGD("BTN-1", "Checking if wakeup_gpio_pin == 6: %s", id(wakeup_gpio_pin) == 6 ? "true" : "false");
+              return id(wakeup_gpio_pin) == 6;
+          then:
+            # Button 4 - Yellow/Amber color
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Entering Button 4 (GPIO6) LED color - Yellow/Amber");
+                ESP_LOGD("BTN-1", "LED state before color: %s", id(status_led).current_values.is_on() ? "ON" : "OFF");
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 4: Turning LED ON with Yellow/Amber color");
+            - light.turn_on:
+                id: status_led
+                brightness: 100%
+                red: 100%
+                green: 75%
+                blue: 0%
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 4: LED should be Yellow/Amber now, displaying for 3 seconds");
+            - delay: 3s
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 4: Turning LED OFF");
+            - light.turn_off:
+                id: status_led
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Button 4 LED color complete");
+      - if:
+          condition:
+            lambda: |-
+              ESP_LOGD("BTN-1", "Checking if wakeup_gpio_pin == 0: %s", id(wakeup_gpio_pin) == 0 ? "true" : "false");
+              return id(wakeup_gpio_pin) == 0;
+          then:
+            # No button wake-up - White color
+            - lambda: |-
+                ESP_LOGD("BTN-1", "Entering No Button wake-up LED color - White");
+                ESP_LOGD("BTN-1", "LED state before color: %s", id(status_led).current_values.is_on() ? "ON" : "OFF");
+            - lambda: |-
+                ESP_LOGD("BTN-1", "No Button: Turning LED ON with White color");
+            - light.turn_on:
+                id: status_led
+                brightness: 100%
+                red: 100%
+                green: 100%
+                blue: 100%
+            - lambda: |-
+                ESP_LOGD("BTN-1", "No Button: LED should be White now, displaying for 3 seconds");
+            - delay: 3s
+            - lambda: |-
+                ESP_LOGD("BTN-1", "No Button: Turning LED OFF");
+            - light.turn_off:
+                id: status_led
+            - lambda: |-
+                ESP_LOGD("BTN-1", "No Button LED color complete");
+      
+      - lambda: |-
+          ESP_LOGD("BTN-1", "=== All LED colors complete, on_boot sequence finished ===");
+  on_shutdown:
+    - light.turn_off: status_led
+
+external_components:
+  - source:
+      type: local
+      path: external_components
+    components:
+      - deep_sleep
+    refresh: always
 
 dashboard_import:
   package_import_url: github://ApolloAutomation/BTN-1/Integrations/ESPHome/BTN-1.yaml

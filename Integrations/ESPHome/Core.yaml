@@ -1,11 +1,12 @@
 substitutions:
-  name: apollo-btn-1 # TODO: Rename
+  name: apollo-btn-1
   version: "24.8.7.2"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 esp32:
   board: esp32-c6-devkitm-1
   variant: esp32c6
+  flash_size: 8MB
   framework:
     type: esp-idf
 
@@ -20,20 +21,144 @@ globals:
     restore_value: no
     type: uint32_t
     initial_value: '0'
+  - id: wakeup_gpio_pin
+    type: int
+    restore_value: no
+    initial_value: '0'
 
 captive_portal:
 
 web_server:
   port: 80
 
+# LED Configuration - Using monochromatic light since we have single GPIO
+light:
+  - platform: esp32_rmt_led_strip
+    id: status_led
+    name: "RGB Light"
+    pin: GPIO3
+    default_transition_length: 0s
+    chipset: WS2812
+    num_leds: 1
+    rgb_order: grb
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
+
+
 
 deep_sleep:
   id: deep_sleep_1
   sleep_duration: 12h
-  run_duration: 90s
+  run_duration: 20s
   esp32_ext1_wakeup:
-    pins: 
-      - GPIO2
-      - GPIO4
-      - GPIO5
-      - GPIO6
+    mode: ANY_HIGH
+    pins:
+      - number: GPIO2
+        allow_other_uses: true
+      - number: GPIO4
+        allow_other_uses: true
+      - number: GPIO5
+        allow_other_uses: true
+      - number: GPIO6
+        allow_other_uses: true
+
+# Wake-up detection sensors
+
+text_sensor:
+  - platform: template
+    id: wakeup_button_sensor
+    name: "Wake-up Button"
+    icon: "mdi:gesture-tap-button"
+
+sensor:
+  - platform: template
+    id: wakeup_pin_sensor
+    name: "Wake-up GPIO Pin"
+    icon: "mdi:pin"
+    unit_of_measurement: ""
+    accuracy_decimals: 0
+
+# Button entities for physical buttons
+binary_sensor:
+  - platform: gpio
+    id: button_1
+    name: "Button 1"
+    pin:
+      number: GPIO2
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: "Button 1 pressed"
+    on_release:
+      then:
+        - logger.log: "Button 1 released"
+
+  - platform: gpio
+    id: button_2
+    name: "Button 2"
+    pin:
+      number: GPIO4
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: "Button 2 pressed"
+    on_release:
+      then:
+        - logger.log: "Button 2 released"
+
+  - platform: gpio
+    id: button_3
+    name: "Button 3"
+    pin:
+      number: GPIO5
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: "Button 3 pressed"
+    on_release:
+      then:
+        - logger.log: "Button 3 released"
+
+  - platform: gpio
+    id: button_4
+    name: "Button 4"
+    pin:
+      number: GPIO6
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+    on_press:
+      then:
+        - logger.log: "Button 4 pressed"
+    on_release:
+      then:
+        - logger.log: "Button 4 released"
