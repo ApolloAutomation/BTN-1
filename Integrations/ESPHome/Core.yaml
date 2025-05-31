@@ -1,10 +1,11 @@
 substitutions:
-  name: apollo-plt-1 # TODO: Rename
+  name: apollo-btn-1 # TODO: Rename
   version: "24.8.7.2"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 esp32:
-  board: esp32-c3-devkitm-1
+  board: esp32-c6-devkitm-1
+  variant: esp32c6
   framework:
     type: esp-idf
 
@@ -24,3 +25,15 @@ captive_portal:
 
 web_server:
   port: 80
+
+
+deep_sleep:
+  id: deep_sleep_1
+  sleep_duration: 12h
+  run_duration: 90s
+  esp32_ext1_wakeup:
+    pins: 
+      - GPIO2
+      - GPIO4
+      - GPIO5
+      - GPIO6
