@@ -1,0 +1,254 @@
+esphome:
+  name: apollo-btn-1
+  friendly_name: Apollo BTN-1
+  comment: Apollo BTN-1
+  name_add_mac_suffix: true
+  platformio_options:
+    board_build.flash_mode: dio
+    board_build.flash_size: 8MB
+
+  project:
+    name: "ApolloAutomation.BTN-1"
+    version: "${version}"
+
+  min_version: 2023.11.1
+
+  # Wake-up detection logic
+  on_boot:
+    - priority: 500
+      then:
+        - lambda: |-
+            id(deep_sleep_1).set_sleep_duration(id(deep_sleep_sleep_duration).state * 60 * 60 * 1000);
+        - if:
+            condition:
+              or:
+                - binary_sensor.is_on: ota_mode
+                - switch.is_on: prevent_sleep
+            then:
+              - lambda: |-
+                  ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA On Boot");
+                  id(deep_sleep_1).prevent_deep_sleep();
+    
+    # Check button states for powered-off scenario
+    - priority: 800
+      then:
+        - lambda: |-
+            // Check if we have a valid deep sleep wake-up source
+            uint64_t wake = esp_sleep_get_ext1_wakeup_status();
+            
+            // If wake is 0, we didn't wake from deep sleep (powered-off scenario)
+            if (wake == 0) {
+              ESP_LOGI("Apollo", "No deep sleep wake detected, checking button states directly");
+              
+              // Check each button GPIO state
+              // Buttons are active HIGH (pressed = HIGH/1)
+              if (gpio_get_level(GPIO_NUM_2) == 1) {
+                ESP_LOGI("Apollo", "Button 1 (GPIO2) is pressed");
+                id(wakeup_pin_sensor).publish_state("2");
+              }
+              else if (gpio_get_level(GPIO_NUM_4) == 1) {
+                ESP_LOGI("Apollo", "Button 2 (GPIO4) is pressed");
+                id(wakeup_pin_sensor).publish_state("4");
+              }
+              else if (gpio_get_level(GPIO_NUM_5) == 1) {
+                ESP_LOGI("Apollo", "Button 3 (GPIO5) is pressed");
+                id(wakeup_pin_sensor).publish_state("5");
+              }
+              else if (gpio_get_level(GPIO_NUM_6) == 1) {
+                ESP_LOGI("Apollo", "Button 4 (GPIO6) is pressed");
+                id(wakeup_pin_sensor).publish_state("6");
+              }
+              else {
+                ESP_LOGI("Apollo", "No button press detected in powered-off scenario");
+                // Don't set to "0" yet, let the deep sleep logic handle it
+              }
+            }
+    
+    - priority: -100
+      then:
+      - lambda: |-
+          uint64_t wake = esp_sleep_get_ext1_wakeup_status();
+          
+          // Only process deep sleep wake if we actually woke from deep sleep
+          if (wake != 0) {
+            uint32_t low = wake % 0xFFFFFFFF;
+            uint32_t high = (wake >> 32) % 0xFFFFFFFF;
+            
+            ESP_LOGI("Apollo", "Deep sleep wake detected, wake status: 0x%llx", wake);
+            
+            // Check which GPIO pin caused the wake-up
+            if ((low) & (1<<(2))) {
+              id(wakeup_pin_sensor).publish_state("2");
+            }
+            else if ((low) & (1<<(4))) {
+              id(wakeup_pin_sensor).publish_state("4");
+            }
+            else if ((low) & (1<<(5))) {
+              id(wakeup_pin_sensor).publish_state("5");
+            }
+            else if ((low) & (1<<(6))) {
+              id(wakeup_pin_sensor).publish_state("6");
+            }
+            else {
+              id(wakeup_pin_sensor).publish_state("0");
+            }
+          }
+          else {
+            // If no deep sleep wake and no button was detected in powered-off scenario
+            // then set to "0" (no button press)
+            if (id(wakeup_pin_sensor).state == "") {
+              ESP_LOGI("Apollo", "No wake source detected, setting to 0");
+              id(wakeup_pin_sensor).publish_state("0");
+            }
+          }
+      
+      # Show LED color based on wake-up source
+      - if:
+          condition:
+            lambda: |-
+              return id(wakeup_pin_sensor).state == "2";
+          then:
+            # Button 1 - Red color
+            - light.turn_on:
+                id: status_led
+                brightness: 100%
+                red: 100%
+                green: 0%
+                blue: 0%
+            - delay: 3s
+            - light.turn_off:
+                id: status_led
+      - if:
+          condition:
+            lambda: |-
+              return id(wakeup_pin_sensor).state == "4";
+          then:
+            # Button 2 - Green color
+            - light.turn_on:
+                id: status_led
+                brightness: 100%
+                red: 0%
+                green: 100%
+                blue: 0%
+            - delay: 3s
+            - light.turn_off:
+                id: status_led
+      - if:
+          condition:
+            lambda: |-
+              return id(wakeup_pin_sensor).state == "5";
+          then:
+            # Button 3 - Blue color
+            - light.turn_on:
+                id: status_led
+                brightness: 100%
+                red: 0%
+                green: 0%
+                blue: 100%
+            - delay: 3s
+            - light.turn_off:
+                id: status_led
+      - if:
+          condition:
+            lambda: |-
+              return id(wakeup_pin_sensor).state == "6";
+          then:
+            # Button 4 - Yellow/Amber color
+            - light.turn_on:
+                id: status_led
+                brightness: 100%
+                red: 100%
+                green: 75%
+                blue: 0%
+            - delay: 3s
+            - light.turn_off:
+                id: status_led
+      - if:
+          condition:
+            lambda: |-
+              return id(wakeup_pin_sensor).state == "0";
+          then:
+            # No button wake-up - White color
+            - light.turn_on:
+                id: status_led
+                brightness: 100%
+                red: 100%
+                green: 100%
+                blue: 100%
+            - delay: 3s
+            - light.turn_off:
+                id: status_led
+      
+      
+  on_shutdown:
+    - light.turn_off: status_led
+
+api:
+ reboot_timeout: 0s
+ on_client_connected:
+   then:
+      - delay: 5s
+     # Add before deep_sleep.enter call:
+      - component.update: wakeup_pin_sensor
+      - delay: 1s
+      - lambda: |-
+          id(wakeup_pin_sensor).publish_state("0");
+      - component.update: wakeup_pin_sensor
+      - delay: 1s
+      - if:
+          condition:
+            or:
+              - binary_sensor.is_on: ota_mode
+              - switch.is_on: prevent_sleep
+          then:
+            - lambda: |-
+                ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA Or Switch");
+                id(deep_sleep_1).prevent_deep_sleep();
+          else:
+            - delay: 10s
+            - deep_sleep.enter:
+                id: deep_sleep_1
+
+external_components:
+  - source: github://ApolloAutomation/ExternalComponents
+    components: [deep_sleep]
+
+dashboard_import:
+  package_import_url: github://ApolloAutomation/BTN-1/Integrations/ESPHome/BTN-1.yaml
+  import_full_config: false
+
+improv_serial:
+
+esp32_improv:
+  authorizer: none
+
+ota:
+  - platform: esphome
+    id: ota_esphome
+  - platform: http_request
+    id: ota_managed
+
+http_request:
+  verify_ssl: true
+
+safe_mode:
+
+update:
+  - platform: http_request
+    id: firmware_update
+    name: Firmware Update
+    source: https://apolloautomation.github.io/BTN-1/artifact/manifest.json
+
+wifi:
+  on_connect:
+    - delay: 5s
+    - ble.disable:
+  on_disconnect:
+    - ble.enable:
+  ap:
+    ssid: "Apollo BTN1 Hotspot"
+
+logger:
+
+packages:
+  core: !include Core.yaml

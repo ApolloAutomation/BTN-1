@@ -1,0 +1,37 @@
+name: Weekly Firmware Build
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  ci:
+    strategy:
+      fail-fast: false
+      matrix:
+        esphome-version:
+          - stable
+          - beta
+          - dev
+    uses: ApolloAutomation/Workflows/.github/workflows/build.yml@main
+    with:
+      file: Integrations/ESPHome/BTN-1.yaml
+      esphome-version: ${{ matrix.esphome-version }}
+
+  notify:
+    name: Notify on Failure
+    needs: [ ci ]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord notification
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ needs.ci.result }}
+          title: Build Failed - ESPHome Firmware
+          description: One or more ESPHome firmware builds failed. Check the logs for details.

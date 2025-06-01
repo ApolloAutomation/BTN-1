@@ -1,0 +1,33 @@
+name: Build and Publish
+
+on:
+  push:
+    branches:
+      - main
+  # Uncomment if needed:
+  # workflow_dispatch:
+  #   inputs:
+  #     version:
+  #       description: 'The version of the firmware to build'
+  #       required: true
+  # release:
+  #   types: [published]
+
+jobs:
+  build-and-publish:
+    uses: ApolloAutomation/Workflows/.github/workflows/build.yml@main
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+      pull-requests: write
+    with:
+      device-name: btn-1
+      yaml-files: |
+        Integrations/ESPHome/BTN-1.yaml
+      core-yaml-path: Integrations/ESPHome/Core.yaml
+      esphome-version: stable
+      check-yaml-changes: true
+      publish-to-pages: true
+      has-installer: true
+      installer-path: static

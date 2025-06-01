@@ -1,10 +1,12 @@
 substitutions:
-  name: apollo-plt-1 # TODO: Rename
-  version: "24.8.7.2"
+  name: apollo-btn-1
+  version: "25.6.1.1"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 esp32:
-  board: esp32-c3-devkitm-1
+  board: esp32-c6-devkitm-1
+  variant: esp32c6
+  flash_size: 8MB
   framework:
     type: esp-idf
 
@@ -24,3 +26,234 @@ captive_portal:
 
 web_server:
   port: 80
+
+# LED Configuration - Using monochromatic light since we have single GPIO
+light:
+  - platform: esp32_rmt_led_strip
+    id: status_led
+    name: "RGB Light"
+    pin: GPIO3
+    default_transition_length: 0s
+    chipset: WS2812
+    num_leds: 1
+    rgb_order: grb
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
+
+deep_sleep:
+  id: deep_sleep_1
+  sleep_duration: 24h
+  run_duration: 90s
+  esp32_ext1_wakeup:
+    mode: ANY_HIGH
+    pins:
+      - number: GPIO2
+        allow_other_uses: true
+      - number: GPIO4
+        allow_other_uses: true
+      - number: GPIO5
+        allow_other_uses: true
+      - number: GPIO6
+        allow_other_uses: true
+
+number:
+  - platform: template
+    name: "Sleep Duration"
+    id: deep_sleep_sleep_duration
+    min_value: 0
+    max_value: 800
+    step: 1
+    mode: box
+    update_interval: never
+    optimistic: true
+    restore_value: true
+    initial_value: 24
+    icon: "mdi:arrow-collapse-right"
+    entity_category: CONFIG
+    unit_of_measurement: "h"
+    on_value:
+      then:
+        - lambda: |-
+            id(deep_sleep_1).set_sleep_duration(x * 60 * 60 * 1000);
+
+# Wake-up detection sensors
+text_sensor:
+  - platform: template
+    id: wakeup_pin_sensor
+    name: "Wake-up GPIO Pin"
+    icon: "mdi:pin"
+
+# Button entities for physical buttons
+binary_sensor:
+  - platform: status
+    name: Online
+    id: ink_ha_connected
+  - platform: gpio
+    pin: 
+      number: GPIO9
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    id: reset_button
+    on_press:
+      then:
+        - lambda: |-
+            id(button_press_timestamp) = millis();    
+    on_release:
+      then:
+        - lambda: |-
+            if (millis() - id(button_press_timestamp) >= 10000) {
+              // Remove Wifi
+              #id(testCycleCount) = 0;
+              #id(runTest) = true;
+              id(prevent_sleep).turn_on();
+              id(factory_reset_switch).turn_on();
+            }
+            else if (millis() - id(button_press_timestamp) >= 3000) {
+              //Turn Prevent Sleep On
+              id(prevent_sleep).turn_on();
+              //Prevent Sleep
+              id(deep_sleep_1).prevent_deep_sleep();
+            }
+            else {
+              // StatusCheck
+              id(statusCheck).execute();
+              #delay(3000);
+              #id(testCycleCount) = 0;
+              #id(runTest) = true;
+              #id(testScript).execute();
+            }
+  - platform: gpio
+    id: button_1
+    name: "Button 1"
+    pin:
+      number: GPIO2
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+
+  - platform: gpio
+    id: button_2
+    name: "Button 2"
+    pin:
+      number: GPIO4
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+
+  - platform: gpio
+    id: button_3
+    name: "Button 3"
+    pin:
+      number: GPIO5
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+
+  - platform: gpio
+    id: button_4
+    name: "Button 4"
+    pin:
+      number: GPIO6
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+
+  - platform: homeassistant
+    name: "OTA Mode"
+    id: ota_mode
+    entity_id: input_boolean.apollo_ota_mode
+    on_press:
+      then:
+        - lambda: |-
+            id(deep_sleep_1).prevent_deep_sleep();
+    on_release:
+      then:
+        - if:
+            condition:
+              switch.is_off: prevent_sleep
+            then:
+              - lambda: |-
+                  id(deep_sleep_1).allow_deep_sleep();
+
+switch:
+  - platform: template
+    name: "Prevent Sleep"
+    id: prevent_sleep
+    icon: mdi:sleep
+    restore_mode: RESTORE_DEFAULT_OFF
+    optimistic: true
+    entity_category: "config"
+    on_turn_on:
+      then:
+        - lambda: |-
+            id(deep_sleep_1).prevent_deep_sleep();
+    on_turn_off:
+      then:
+        - if:
+            condition:
+              binary_sensor.is_off: ota_mode
+            then:
+              - lambda: |-
+                  id(deep_sleep_1).allow_deep_sleep();
+
+script:
+  - id: statusCheck
+    then:
+      - if:
+          condition:
+            - lambda: 'return id(ink_ha_connected).state;'
+          then:
+            - logger.log: "Apollo Automation: Connected To HA"
+            - light.turn_on: 
+                id: rgb_light
+                brightness: 100%
+                red: 0%
+                green: 0%
+                blue: 100%
+          else:
+            - if:
+                condition:
+                  - wifi.connected
+                then:
+                  - logger.log: "Apollo Automation: Connected To Wifi"
+                  - light.turn_on: 
+                      id: rgb_light
+                      brightness: 100%
+                      red: 0%
+                      green: 100%
+                      blue: 0%
+                else:
+                  - logger.log: "Apollo Automation: Not Connected To Wifi"
+                  - light.turn_on: 
+                      id: rgb_light
+                      brightness: 100%
+                      red: 100%
+                      green: 100%
+                      blue: 0%
+      - delay: 5s
+      - light.turn_off: rgb_light

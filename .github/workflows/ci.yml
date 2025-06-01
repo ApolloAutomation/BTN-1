@@ -3,27 +3,30 @@ name: CI
 on:
   pull_request:
 
+permissions:
+  # Allow GITHUB_TOKEN to add labels to pull requests
+  pull-requests: write
+  issues: write
+  contents: read
+  id-token: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
+  label-check:
+    uses: ApolloAutomation/Workflows/.github/workflows/label-check.yml@main
   ci:
-    name: Building ${{ matrix.file }}
-    runs-on: ubuntu-latest
+    needs: [ label-check ]
     strategy:
+      fail-fast: false
       matrix:
-        file: # TODO: Rename
-          - Integrations/ESPHome/PLT-1.yaml
-          - Integrations/ESPHome/PLT-1_BLE.yaml
         esphome-version:
           - stable
           - beta
           - dev
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4.1.7
-      - name: Build ESPHome firmware to verify configuration
-        uses: esphome/build-action@v3.1.0
-        with:
-          yaml_file: ${{ matrix.file }}
+    uses: ApolloAutomation/Workflows/.github/workflows/build.yml@main
+    with:
+      file: Integrations/ESPHome/BTN-1.yaml
+      esphome-version: ${{ matrix.esphome-version }}
