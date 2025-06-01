@@ -30,7 +30,7 @@ web_server:
 # LED Configuration - Using monochromatic light since we have single GPIO
 light:
   - platform: esp32_rmt_led_strip
-    id: status_led
+    id: rgb_light
     name: "RGB Light"
     pin: GPIO3
     default_transition_length: 0s
@@ -116,10 +116,10 @@ binary_sensor:
         - lambda: |-
             if (millis() - id(button_press_timestamp) >= 10000) {
               // Remove Wifi
-              #id(testCycleCount) = 0;
-              #id(runTest) = true;
+              // id(testCycleCount) = 0;
+              // id(runTest) = true;
               id(prevent_sleep).turn_on();
-              id(factory_reset_switch).turn_on();
+              // id(factory_reset_switch).turn_on();
             }
             else if (millis() - id(button_press_timestamp) >= 3000) {
               //Turn Prevent Sleep On
@@ -130,10 +130,10 @@ binary_sensor:
             else {
               // StatusCheck
               id(statusCheck).execute();
-              #delay(3000);
-              #id(testCycleCount) = 0;
-              #id(runTest) = true;
-              #id(testScript).execute();
+              delay(3000);
+              // id(testCycleCount) = 0;
+              // id(runTest) = true;
+              // id(testScript).execute();
             }
   - platform: gpio
     id: button_1
