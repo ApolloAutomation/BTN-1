@@ -4,12 +4,13 @@ on:
   push:
     branches:
       - main
-  # Uncomment if needed:
-  # workflow_dispatch:
-  #   inputs:
-  #     version:
-  #       description: 'The version of the firmware to build'
-  #       required: true
+  workflow_dispatch:
+    inputs:
+      bypass-yaml-check:
+        description: 'Bypass YAML change check (force build/publish)'
+        type: boolean
+        required: false
+        default: false
   # release:
   #   types: [published]
 
@@ -27,7 +28,8 @@ jobs:
         Integrations/ESPHome/BTN-1.yaml
       core-yaml-path: Integrations/ESPHome/Core.yaml
       esphome-version: stable
-      check-yaml-changes: true
+      # Bypass check if manually triggered with bypass option
+      check-yaml-changes: ${{ !(github.event_name == 'workflow_dispatch' && github.event.inputs.bypass-yaml-check == 'true') }}
       publish-to-pages: true
       has-installer: true
       installer-path: static
