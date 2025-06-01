@@ -28,5 +28,6 @@ jobs:
           - dev
     uses: ApolloAutomation/Workflows/.github/workflows/build.yml@main
     with:
-      file: Integrations/ESPHome/BTN-1.yaml
+      device-name: BTN-1
+      yaml-files: Integrations/ESPHome/BTN-1.yaml
       esphome-version: ${{ matrix.esphome-version }}
