@@ -21,10 +21,6 @@ globals:
     restore_value: no
     type: uint32_t
     initial_value: '0'
-  - id: wakeup_gpio_pin
-    type: int
-    restore_value: no
-    initial_value: '0'
 
 captive_portal:
 
@@ -55,12 +51,10 @@ light:
           min_brightness: 50%
           max_brightness: 100%
 
-
-
 deep_sleep:
   id: deep_sleep_1
-  sleep_duration: 12h
-  run_duration: 20s
+  sleep_duration: 24h
+  run_duration: 90s
   esp32_ext1_wakeup:
     mode: ANY_HIGH
     pins:
@@ -73,21 +67,32 @@ deep_sleep:
       - number: GPIO6
         allow_other_uses: true
 
-# Wake-up detection sensors
-
-text_sensor:
+number:
   - platform: template
-    id: wakeup_button_sensor
-    name: "Wake-up Button"
-    icon: "mdi:gesture-tap-button"
+    name: "Sleep Duration"
+    id: deep_sleep_sleep_duration
+    min_value: 0
+    max_value: 800
+    step: 1
+    mode: box
+    update_interval: never
+    optimistic: true
+    restore_value: true
+    initial_value: 24
+    icon: "mdi:arrow-collapse-right"
+    entity_category: CONFIG
+    unit_of_measurement: "h"
+    on_value:
+      then:
+        - lambda: |-
+            id(deep_sleep_1).set_sleep_duration(x * 60 * 60 * 1000);
 
-sensor:
+# Wake-up detection sensors
+text_sensor:
   - platform: template
     id: wakeup_pin_sensor
     name: "Wake-up GPIO Pin"
     icon: "mdi:pin"
-    unit_of_measurement: ""
-    accuracy_decimals: 0
 
 # Button entities for physical buttons
 binary_sensor:
@@ -102,12 +107,6 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
-    on_press:
-      then:
-        - logger.log: "Button 1 pressed"
-    on_release:
-      then:
-        - logger.log: "Button 1 released"
 
   - platform: gpio
     id: button_2
@@ -120,12 +119,6 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
-    on_press:
-      then:
-        - logger.log: "Button 2 pressed"
-    on_release:
-      then:
-        - logger.log: "Button 2 released"
 
   - platform: gpio
     id: button_3
@@ -138,12 +131,6 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
-    on_press:
-      then:
-        - logger.log: "Button 3 pressed"
-    on_release:
-      then:
-        - logger.log: "Button 3 released"
 
   - platform: gpio
     id: button_4
@@ -156,9 +143,41 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
+
+  - platform: homeassistant
+    name: "OTA Mode"
+    id: ota_mode
+    entity_id: input_boolean.apollo_ota_mode
     on_press:
       then:
-        - logger.log: "Button 4 pressed"
+        - lambda: |-
+            id(deep_sleep_1).prevent_deep_sleep();
     on_release:
       then:
-        - logger.log: "Button 4 released"
+        - if:
+            condition:
+              switch.is_off: prevent_sleep
+            then:
+              - lambda: |-
+                  id(deep_sleep_1).allow_deep_sleep();
+
+switch:
+  - platform: template
+    name: "Prevent Sleep"
+    id: prevent_sleep
+    icon: mdi:sleep
+    restore_mode: RESTORE_DEFAULT_OFF
+    optimistic: true
+    entity_category: "config"
+    on_turn_on:
+      then:
+        - lambda: |-
+            id(deep_sleep_1).prevent_deep_sleep();
+    on_turn_off:
+      then:
+        - if:
+            condition:
+              binary_sensor.is_off: ota_mode
+            then:
+              - lambda: |-
+                  id(deep_sleep_1).allow_deep_sleep();
