@@ -6,11 +6,37 @@ substitutions:
 esp32:
   board: esp32-c6-devkitm-1
   variant: esp32c6
-  flash_size: 8MB
+  flash_size: 4MB
   framework:
     type: esp-idf
 
 api:
+  services:
+    - service: play_buzzer
+      variables:
+        song_str: string
+      then:
+        - rtttl.play:
+            rtttl: !lambda 'return song_str;'
+  reboot_timeout: 0s
+  on_client_connected:
+    then:
+      - delay: 5s
+      - if:
+          condition:
+            or:
+              - binary_sensor.is_on: ota_mode
+              - switch.is_on: prevent_sleep
+          then:
+            - lambda: |- 
+                ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA Or Switch");
+                id(deep_sleep_1).prevent_deep_sleep(); 
+          else: 
+            - lambda: |-
+                id(reportAllValues).execute();
+            - delay: 2s
+            - deep_sleep.enter:
+                id: deep_sleep_1
 
 globals:
   - id: cycleCounter
@@ -27,29 +53,19 @@ captive_portal:
 web_server:
   port: 80
 
-# LED Configuration - Using monochromatic light since we have single GPIO
-light:
-  - platform: esp32_rmt_led_strip
-    id: rgb_light
-    name: "RGB Light"
-    pin: GPIO3
-    default_transition_length: 0s
-    chipset: WS2812
-    num_leds: 1
-    rgb_order: grb
-    effects:
-      - pulse:
-          name: "Slow Pulse"
-          transition_length: 1000ms
-          update_interval: 1000ms
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Fast Blink"
-          transition_length: 100ms
-          update_interval: 100ms
-          min_brightness: 50%
-          max_brightness: 100%
+i2c:
+  sda: GPIO1
+  scl: GPIO0
+
+# Buzzer
+output:
+  - platform: ledc
+    pin: GPIO23
+    id: buzzer
+rtttl:
+  id: rtttl_buzzer
+  output: buzzer
+
 
 deep_sleep:
   id: deep_sleep_1
@@ -119,7 +135,7 @@ binary_sensor:
               // id(testCycleCount) = 0;
               // id(runTest) = true;
               id(prevent_sleep).turn_on();
-              // id(factory_reset_switch).turn_on();
+              id(factory_reset_switch).turn_on();
             }
             else if (millis() - id(button_press_timestamp) >= 3000) {
               //Turn Prevent Sleep On
@@ -163,7 +179,7 @@ binary_sensor:
     id: button_3
     name: "Button 3"
     pin:
-      number: GPIO5
+      number: GPIO6
       allow_other_uses: true
       mode:
         input: true
@@ -175,7 +191,7 @@ binary_sensor:
     id: button_4
     name: "Button 4"
     pin:
-      number: GPIO6
+      number: GPIO5
       allow_other_uses: true
       mode:
         input: true
@@ -200,12 +216,28 @@ binary_sensor:
               - lambda: |-
                   id(deep_sleep_1).allow_deep_sleep();
 
+sensor:
+  - platform: internal_temperature
+    name: "ESP Temperature"
+    id: sys_esp_temperature
+
+  - platform: uptime
+    name: Uptime
+    id: sys_uptime
+    update_interval: 60s
+
+  - platform: wifi_signal
+    name: RSSI
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+
 switch:
   - platform: template
     name: "Prevent Sleep"
     id: prevent_sleep
     icon: mdi:sleep
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: RESTORE_DEFAULT_ON
     optimistic: true
     entity_category: "config"
     on_turn_on:
@@ -220,6 +252,77 @@ switch:
             then:
               - lambda: |-
                   id(deep_sleep_1).allow_deep_sleep();
+  - platform: factory_reset
+    id: factory_reset_switch
+    internal: true
+  - platform: gpio
+    pin: GPIO19
+    name: "Power Latch"
+    id: power_latch
+    restore_mode: ALWAYS_ON
+    setup_priority: 2000
+    internal: true
+  - platform: gpio
+    pin: GPIO18
+    name: "Accessory Power"
+    id: accessory_power
+    restore_mode: ALWAYS_ON
+    setup_priority: 2000
+    internal: true
+
+# LED Configuration - Using monochromatic light since we have single GPIO
+light:
+  - platform: partition
+    name: "BTN 1 Light"
+    segments:
+      # Use first 10 LEDs from the light with ID light1
+      - id: rgb_light
+        from: 0
+        to: 0
+  - platform: partition
+    name: "BTN 2 Light"
+    segments:
+      # Use first 10 LEDs from the light with ID light1
+      - id: rgb_light
+        from: 1
+        to: 1
+  - platform: partition
+    name: "BTN 3 Light"
+    segments:
+      # Use first 10 LEDs from the light with ID light1
+      - id: rgb_light
+        from: 2
+        to: 2
+  - platform: partition
+    name: "BTN 4 Light"
+    segments:
+      # Use first 10 LEDs from the light with ID light1
+      - id: rgb_light
+        from: 3
+        to: 3
+  - platform: esp32_rmt_led_strip
+    id: rgb_light
+    name: "RGB Light"
+    pin: GPIO21
+    default_transition_length: 0s
+    chipset: WS2812
+    num_leds: 5
+    rgb_order: grb
+    internal: true
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
+
 
 script:
   - id: statusCheck
@@ -257,3 +360,9 @@ script:
                       blue: 0%
       - delay: 5s
       - light.turn_off: rgb_light
+  - id: reportAllValues
+    then:
+      - component.update: wifi_signal_db
+      - component.update: sys_esp_temperature
+      - component.update: sys_uptime
+      - component.update: wakeup_pin_sensor

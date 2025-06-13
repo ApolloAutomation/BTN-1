@@ -1,0 +1,18 @@
+font:
+  - file: "fonts/RobotoCondensed-Regular.ttf"
+    id: my_font_with_icons
+    size: 20
+    bpp: 4
+    extras:
+      - file: "fonts/materialdesignicons-webfont.ttf"
+        glyphs: [
+          "\U000F02D1", # mdi-heart
+          "\U000F05D4", # mdi-airplane-landing
+          ]
+
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3C
+    lambda: |-
+      it.print(0, 0, id(my_font_with_icons), "I \U000F02D1 You \U000F02D1");
