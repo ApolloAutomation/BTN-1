@@ -40,23 +40,23 @@ esphome:
             if (wake == 0) {
               ESP_LOGI("Apollo", "No deep sleep wake detected, checking button states directly");
               
-              // Check each button GPIO state
+              // Check each button state
               // Buttons are active HIGH (pressed = HIGH/1)
               if (gpio_get_level(GPIO_NUM_2) == 1) {
                 ESP_LOGI("Apollo", "Button 1 (GPIO2) is pressed");
-                id(wakeup_pin_sensor).publish_state("2");
+                id(wakeup_button_pressed).publish_state("1");
               }
               else if (gpio_get_level(GPIO_NUM_4) == 1) {
                 ESP_LOGI("Apollo", "Button 2 (GPIO4) is pressed");
-                id(wakeup_pin_sensor).publish_state("4");
-              }
-              else if (gpio_get_level(GPIO_NUM_5) == 1) {
-                ESP_LOGI("Apollo", "Button 3 (GPIO5) is pressed");
-                id(wakeup_pin_sensor).publish_state("5");
+                id(wakeup_button_pressed).publish_state("2");
               }
               else if (gpio_get_level(GPIO_NUM_6) == 1) {
-                ESP_LOGI("Apollo", "Button 4 (GPIO6) is pressed");
-                id(wakeup_pin_sensor).publish_state("6");
+                ESP_LOGI("Apollo", "Button 3 (GPIO6) is pressed");
+                id(wakeup_button_pressed).publish_state("3");
+              }
+              else if (gpio_get_level(GPIO_NUM_5) == 1) {
+                ESP_LOGI("Apollo", "Button 4 (GPIO5) is pressed");
+                id(wakeup_button_pressed).publish_state("4");
               }
               else {
                 ESP_LOGI("Apollo", "No button press detected in powered-off scenario");
@@ -76,46 +76,48 @@ esphome:
             
             ESP_LOGI("Apollo", "Deep sleep wake detected, wake status: 0x%llx", wake);
             
-            // Check which GPIO pin caused the wake-up
+            // Check which button caused the wake-up
             if ((low) & (1<<(2))) {
-              id(wakeup_pin_sensor).publish_state("2");
+              id(wakeup_button_pressed).publish_state("1");
             }
             else if ((low) & (1<<(4))) {
-              id(wakeup_pin_sensor).publish_state("4");
-            }
-            else if ((low) & (1<<(5))) {
-              id(wakeup_pin_sensor).publish_state("5");
+              id(wakeup_button_pressed).publish_state("2");
             }
             else if ((low) & (1<<(6))) {
-              id(wakeup_pin_sensor).publish_state("6");
+              id(wakeup_button_pressed).publish_state("3");
+            }
+            else if ((low) & (1<<(5))) {
+              id(wakeup_button_pressed).publish_state("4");
             }
             else {
-              id(wakeup_pin_sensor).publish_state("0");
+              id(wakeup_button_pressed).publish_state("0");
             }
           }
           else {
             // If no deep sleep wake and no button was detected in powered-off scenario
             // then set to "0" (no button press)
-            if (id(wakeup_pin_sensor).state == "") {
+            if (id(wakeup_button_pressed).state == "") {
               ESP_LOGI("Apollo", "No wake source detected, setting to 0");
-              id(wakeup_pin_sensor).publish_state("0");
+              id(wakeup_button_pressed).publish_state("0");
             }
           }
           
   on_shutdown:
     - light.turn_off: rgb_light
+    - switch.turn_off: accessory_power
+    - switch.turn_off: power_latch
 
 api:
- reboot_timeout: 0s
- on_client_connected:
-   then: #TODO: Should We Trigger The Button Click That Woke Up The Device?
+  reboot_timeout: 0s
+  on_client_connected:
+    then: #TODO: Should We Trigger The Button Click That Woke Up The Device?
       - delay: 5s
-     # Add before deep_sleep.enter call:
-      - component.update: wakeup_pin_sensor
+      # Add before deep_sleep.enter call:
+      - component.update: wakeup_button_pressed
       - delay: 1s
       - lambda: |-
-          id(wakeup_pin_sensor).publish_state("0");
-      - component.update: wakeup_pin_sensor
+          id(wakeup_button_pressed).publish_state("0");
+      - component.update: wakeup_button_pressed
       - delay: 1s
       - if:
           condition:
