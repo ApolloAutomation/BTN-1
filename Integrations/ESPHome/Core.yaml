@@ -279,6 +279,19 @@ light:
       - id: rgb_light
         from: 0
         to: 0
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
   - platform: partition
     name: "BTN 2 Light"
     segments:
@@ -286,6 +299,19 @@ light:
       - id: rgb_light
         from: 1
         to: 1
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
   - platform: partition
     name: "BTN 3 Light"
     segments:
@@ -293,6 +319,19 @@ light:
       - id: rgb_light
         from: 2
         to: 2
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
   - platform: partition
     name: "BTN 4 Light"
     segments:
@@ -300,6 +339,19 @@ light:
       - id: rgb_light
         from: 3
         to: 3
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
   - platform: esp32_rmt_led_strip
     id: rgb_light
     name: "RGB Light"

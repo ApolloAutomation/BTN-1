@@ -110,13 +110,47 @@ esphome:
 api:
   reboot_timeout: 0s
   on_client_connected:
-    then: #TODO: Should We Trigger The Button Click That Woke Up The Device?
+    then:
       - delay: 5s
-      # Add before deep_sleep.enter call:
-      - component.update: wakeup_button_pressed
+      # Trigger the button that woke up the device
+      - lambda: |-
+          // Get which button woke up the device
+          std::string wake_button = id(wakeup_button_pressed).state;
+          
+          if (wake_button != "0" && wake_button != "") {
+            ESP_LOGI("Apollo", "Client connected - triggering wake button %s", wake_button.c_str());
+            
+            // Trigger the corresponding binary sensor
+            if (wake_button == "1") {
+              id(button_1).publish_state(true);
+            } else if (wake_button == "2") {
+              id(button_2).publish_state(true);
+            } else if (wake_button == "3") {
+              id(button_3).publish_state(true);
+            } else if (wake_button == "4") {
+              id(button_4).publish_state(true);
+            }
+          }
       - delay: 1s
       - lambda: |-
-          id(wakeup_button_pressed).publish_state("0");
+          // Get which button woke up the device again
+          std::string wake_button = id(wakeup_button_pressed).state;
+          
+          if (wake_button != "0" && wake_button != "") {
+            // Release the corresponding binary sensor
+            if (wake_button == "1") {
+              id(button_1).publish_state(false);
+            } else if (wake_button == "2") {
+              id(button_2).publish_state(false);
+            } else if (wake_button == "3") {
+              id(button_3).publish_state(false);
+            } else if (wake_button == "4") {
+              id(button_4).publish_state(false);
+            }
+            
+            // Reset the wake button sensor to "0"
+            id(wakeup_button_pressed).publish_state("0");
+          }
       - component.update: wakeup_button_pressed
       - delay: 1s
       - if:
