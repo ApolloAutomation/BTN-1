@@ -110,6 +110,39 @@ text_sensor:
     name: "Wake-up Button Pressed"
     icon: "mdi:gesture-tap-button"
 
+event:
+  - platform: template
+    id: button_1_event
+    name: Button 1
+    event_types:
+      - Single Click
+      - Double Click
+      - Long Press
+
+  - platform: template
+    id: button_2_event
+    name: Button 2
+    event_types:
+      - Single Click
+      - Double Click
+      - Long Press
+
+  - platform: template
+    id: button_3_event
+    name: Button 3
+    event_types:
+      - Single Click
+      - Double Click
+      - Long Press
+
+  - platform: template
+    id: button_4_event
+    name: Button 4
+    event_types:
+      - Single Click
+      - Double Click
+      - Long Press
+
 # Button entities for physical buttons
 binary_sensor:
   - platform: status
@@ -160,8 +193,33 @@ binary_sensor:
       mode:
         input: true
         pulldown: true
-    filters:
-      - delayed_off: 10ms
+    internal: true
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+                - event.trigger:
+                    id: button_1_event
+                    event_type: Single Click
+
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+                - event.trigger:
+                    id: button_1_event
+                    event_type: Double Click
+
+      - timing:
+          - ON for 1s to 1.5s
+          - OFF for at least 0.5s
+        then:
+                - event.trigger:
+                    id: button_1_event
+                    event_type: Long Press
 
   - platform: gpio
     id: button_2
@@ -172,8 +230,33 @@ binary_sensor:
       mode:
         input: true
         pulldown: true
-    filters:
-      - delayed_off: 10ms
+    internal: true
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+                - event.trigger:
+                    id: button_2_event
+                    event_type: Single Click
+
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+                - event.trigger:
+                    id: button_2_event
+                    event_type: Double Click
+
+      - timing:
+          - ON for 1s to 1.5s
+          - OFF for at least 0.5s
+        then:
+                - event.trigger:
+                    id: button_2_event
+                    event_type: Long Press
 
   - platform: gpio
     id: button_3
@@ -186,6 +269,33 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
+    internal: true
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+                - event.trigger:
+                    id: button_3_event
+                    event_type: Single Click
+
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+                - event.trigger:
+                    id: button_3_event
+                    event_type: Double Click
+
+      - timing:
+          - ON for 1s to 1.5s
+          - OFF for at least 0.5s
+        then:
+                - event.trigger:
+                    id: button_3_event
+                    event_type: Long Press
 
   - platform: gpio
     id: button_4
@@ -198,6 +308,33 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
+    internal: true
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+                - event.trigger:
+                    id: button_4_event
+                    event_type: Single Click
+
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+                - event.trigger:
+                    id: button_4_event
+                    event_type: Double Click
+
+      - timing:
+          - ON for 1s to 1.5s
+          - OFF for at least 0.5s
+        then:
+                - event.trigger:
+                    id: button_4_event
+                    event_type: Long Press
 
   - platform: homeassistant
     name: "OTA Mode"
