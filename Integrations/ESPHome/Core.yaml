@@ -495,7 +495,7 @@ light:
     pin: GPIO21
     default_transition_length: 0s
     chipset: WS2812
-    num_leds: 5
+    num_leds: 4
     rgb_order: grb
     internal: true
     effects:
