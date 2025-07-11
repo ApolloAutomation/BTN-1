@@ -10,24 +10,33 @@ permissions:
   contents: read
   id-token: write
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
 jobs:
   label-check:
+    name: Label Check
     uses: ApolloAutomation/Workflows/.github/workflows/label-check.yml@main
+    
   ci:
-    needs: [ label-check ]
+    name: Building ${{ matrix.file }} / ESPHome ${{ matrix.esphome-version }} / ESPHome ${{ matrix.esphome-version }}
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
+        file:
+          - Integrations/ESPHome/BTN-1.yaml
         esphome-version:
           - stable
           - beta
           - dev
-    uses: ApolloAutomation/Workflows/.github/workflows/build.yml@main
-    with:
-      device-name: BTN-1
-      yaml-files: Integrations/ESPHome/BTN-1.yaml
-      esphome-version: ${{ matrix.esphome-version }}
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4.2.2
+      - name: Build ESPHome firmware to verify configuration
+        uses: esphome/build-action@v7
+        with:
+          yaml-file: ${{ matrix.file }}
+
+
+
+
+
+
+
