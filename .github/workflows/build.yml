@@ -26,6 +26,7 @@ jobs:
       device-name: btn-1
       yaml-files: |
         Integrations/ESPHome/BTN-1.yaml
+      firmware-names: "1:firmware"
       core-yaml-path: Integrations/ESPHome/Core.yaml
       esphome-version: stable
       # Bypass check if manually triggered with bypass option
