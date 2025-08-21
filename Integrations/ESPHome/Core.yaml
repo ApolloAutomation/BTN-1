@@ -11,6 +11,7 @@ esp32:
     type: esp-idf
 
 api:
+  id: api_server
   services:
     - service: play_buzzer
       variables:
@@ -30,11 +31,14 @@ globals:
     initial_value: '0'
 
 captive_portal:
+  id: captive_portal_instance
 
 web_server:
+  id: web_server_instance
   port: 80
 
 i2c:
+  id: i2c_bus
   sda: GPIO1
   scl: GPIO0
 
@@ -349,6 +353,19 @@ sensor:
     id: wifi_signal_db
     update_interval: 60s
     entity_category: "diagnostic"
+
+  - platform: max17048
+    id: max_17048
+    battery_voltage:
+      name: Battery voltage
+      id: batt_v
+    battery_level:
+      name: Battery level
+      id: batt_pct
+      filters:
+        - lambda: |
+            if (x > 100) return 100;
+            else return (x);
 
 switch:
   - platform: template

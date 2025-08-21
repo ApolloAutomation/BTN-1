@@ -156,6 +156,8 @@ api:
 external_components:
   - source: github://ApolloAutomation/ExternalComponents
     components: [deep_sleep]
+  - source: github://ApolloAutomation/esphome-battery-component
+    components: [max17048] #Forked OptionZero
 
 dashboard_import:
   package_import_url: github://ApolloAutomation/BTN-1/Integrations/ESPHome/BTN-1.yaml
