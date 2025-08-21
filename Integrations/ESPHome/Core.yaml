@@ -1,16 +1,17 @@
 substitutions:
   name: apollo-btn-1
-  version: "25.6.1.3"
+  version: "25.8.21.1"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 esp32:
   board: esp32-c6-devkitm-1
   variant: esp32c6
-  flash_size: 4MB
+  flash_size: 8MB
   framework:
     type: esp-idf
 
 api:
+  id: api_server
   services:
     - service: play_buzzer
       variables:
@@ -18,25 +19,6 @@ api:
       then:
         - rtttl.play:
             rtttl: !lambda 'return song_str;'
-  reboot_timeout: 0s
-  on_client_connected:
-    then:
-      - delay: 5s
-      - if:
-          condition:
-            or:
-              - binary_sensor.is_on: ota_mode
-              - switch.is_on: prevent_sleep
-          then:
-            - lambda: |- 
-                ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA Or Switch");
-                id(deep_sleep_1).prevent_deep_sleep(); 
-          else: 
-            - lambda: |-
-                id(reportAllValues).execute();
-            - delay: 2s
-            - deep_sleep.enter:
-                id: deep_sleep_1
 
 globals:
   - id: cycleCounter
@@ -49,11 +31,14 @@ globals:
     initial_value: '0'
 
 captive_portal:
+  id: captive_portal_instance
 
 web_server:
+  id: web_server_instance
   port: 80
 
 i2c:
+  id: i2c_bus
   sda: GPIO1
   scl: GPIO0
 
@@ -199,9 +184,9 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-                - event.trigger:
-                    id: button_1_event
-                    event_type: Single Click
+          - event.trigger:
+              id: button_1_event
+              event_type: Single Click
 
       - timing:
           - ON for at most 300ms
@@ -209,17 +194,17 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at least 0.2s
         then:
-                - event.trigger:
-                    id: button_1_event
-                    event_type: Double Click
+          - event.trigger:
+              id: button_1_event
+              event_type: Double Click
 
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
         then:
-                - event.trigger:
-                    id: button_1_event
-                    event_type: Long Press
+          - event.trigger:
+              id: button_1_event
+              event_type: Long Press
 
   - platform: gpio
     id: button_2
@@ -236,9 +221,9 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-                - event.trigger:
-                    id: button_2_event
-                    event_type: Single Click
+          - event.trigger:
+              id: button_2_event
+              event_type: Single Click
 
       - timing:
           - ON for at most 300ms
@@ -246,17 +231,17 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at least 0.2s
         then:
-                - event.trigger:
-                    id: button_2_event
-                    event_type: Double Click
+          - event.trigger:
+              id: button_2_event
+              event_type: Double Click
 
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
         then:
-                - event.trigger:
-                    id: button_2_event
-                    event_type: Long Press
+          - event.trigger:
+              id: button_2_event
+              event_type: Long Press
 
   - platform: gpio
     id: button_3
@@ -275,9 +260,9 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-                - event.trigger:
-                    id: button_3_event
-                    event_type: Single Click
+          - event.trigger:
+              id: button_3_event
+              event_type: Single Click
 
       - timing:
           - ON for at most 300ms
@@ -285,17 +270,17 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at least 0.2s
         then:
-                - event.trigger:
-                    id: button_3_event
-                    event_type: Double Click
+          - event.trigger:
+              id: button_3_event
+              event_type: Double Click
 
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
         then:
-                - event.trigger:
-                    id: button_3_event
-                    event_type: Long Press
+          - event.trigger:
+              id: button_3_event
+              event_type: Long Press
 
   - platform: gpio
     id: button_4
@@ -369,6 +354,19 @@ sensor:
     update_interval: 60s
     entity_category: "diagnostic"
 
+  - platform: max17048
+    id: max_17048
+    battery_voltage:
+      name: Battery voltage
+      id: batt_v
+    battery_level:
+      name: Battery level
+      id: batt_pct
+      filters:
+        - lambda: |
+            if (x > 100) return 100;
+            else return (x);
+
 switch:
   - platform: template
     name: "Prevent Sleep"
@@ -407,12 +405,11 @@ switch:
     setup_priority: 2000
     internal: true
 
-# LED Configuration - Using monochromatic light since we have single GPIO
 light:
   - platform: partition
     name: "BTN 1 Light"
+    default_transition_length: 0s
     segments:
-      # Use first 10 LEDs from the light with ID light1
       - id: rgb_light
         from: 0
         to: 0
@@ -431,8 +428,8 @@ light:
           max_brightness: 100%
   - platform: partition
     name: "BTN 2 Light"
+    default_transition_length: 0s
     segments:
-      # Use first 10 LEDs from the light with ID light1
       - id: rgb_light
         from: 1
         to: 1
@@ -451,8 +448,8 @@ light:
           max_brightness: 100%
   - platform: partition
     name: "BTN 3 Light"
+    default_transition_length: 0s
     segments:
-      # Use first 10 LEDs from the light with ID light1
       - id: rgb_light
         from: 2
         to: 2
@@ -471,8 +468,8 @@ light:
           max_brightness: 100%
   - platform: partition
     name: "BTN 4 Light"
+    default_transition_length: 0s
     segments:
-      # Use first 10 LEDs from the light with ID light1
       - id: rgb_light
         from: 3
         to: 3

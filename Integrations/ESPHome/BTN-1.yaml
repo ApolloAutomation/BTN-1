@@ -121,63 +121,52 @@ api:
             
             // Trigger the corresponding binary sensor
             if (wake_button == "1") {
-              id(button_1).publish_state(true);
+              id(button_1_event).trigger("Single Click");
             } else if (wake_button == "2") {
-              id(button_2).publish_state(true);
+              id(button_2_event).trigger("Single Click");
             } else if (wake_button == "3") {
-              id(button_3).publish_state(true);
+              id(button_3_event).trigger("Single Click");
             } else if (wake_button == "4") {
-              id(button_4).publish_state(true);
+              id(button_4_event).trigger("Single Click");
             }
-          }
-      - delay: 1s
-      - lambda: |-
-          // Get which button woke up the device again
-          std::string wake_button = id(wakeup_button_pressed).state;
-          
-          if (wake_button != "0" && wake_button != "") {
-            // Release the corresponding binary sensor
-            if (wake_button == "1") {
-              id(button_1).publish_state(false);
-            } else if (wake_button == "2") {
-              id(button_2).publish_state(false);
-            } else if (wake_button == "3") {
-              id(button_3).publish_state(false);
-            } else if (wake_button == "4") {
-              id(button_4).publish_state(false);
-            }
-            
-            // Reset the wake button sensor to "0"
             id(wakeup_button_pressed).publish_state("0");
           }
+
+      # Send Wake up Button State
       - component.update: wakeup_button_pressed
-      - delay: 1s
+
+      # Check OTA Switch
+      - delay: 3s
       - if:
           condition:
             or:
               - binary_sensor.is_on: ota_mode
               - switch.is_on: prevent_sleep
           then:
-            - lambda: |-
+            - lambda: |- 
                 ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA Or Switch");
-                id(deep_sleep_1).prevent_deep_sleep();
-          else:
-            - delay: 10s
+                id(deep_sleep_1).prevent_deep_sleep(); 
+          else: 
+            - lambda: |-
+                id(reportAllValues).execute();
+            - delay: 2s
             - deep_sleep.enter:
                 id: deep_sleep_1
 
 external_components:
   - source: github://ApolloAutomation/ExternalComponents
     components: [deep_sleep]
+  - source: github://ApolloAutomation/esphome-battery-component
+    components: [max17048] #Forked OptionZero
 
 dashboard_import:
   package_import_url: github://ApolloAutomation/BTN-1/Integrations/ESPHome/BTN-1.yaml
   import_full_config: false
 
-#improv_serial:
+improv_serial:
 
-#esp32_improv:
-#  authorizer: none
+esp32_improv:
+  authorizer: none
 
 ota:
   - platform: esphome
@@ -194,14 +183,14 @@ update:
   - platform: http_request
     id: firmware_update
     name: Firmware Update
-    source: https://apolloautomation.github.io/BTN-1/artifact/manifest.json
+    source: https://apolloautomation.github.io/BTN-1/firmware/manifest.json
 
 wifi:
-#  on_connect:
-#    - delay: 5s
-#    - ble.disable:
-#  on_disconnect:
-#    - ble.enable:
+  on_connect:
+    - delay: 5s
+    - ble.disable:
+  on_disconnect:
+    - ble.enable:
   ap:
     ssid: "Apollo BTN1 Hotspot"
 
