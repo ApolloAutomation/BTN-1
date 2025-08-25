@@ -169,6 +169,7 @@ binary_sensor:
               // id(runTest) = true;
               // id(testScript).execute();
             }
+
   - platform: gpio
     id: button_1
     name: "Button 1"
@@ -178,7 +179,8 @@ binary_sensor:
       mode:
         input: true
         pulldown: true
-    internal: true
+    internal: false
+    disabled_by_default: true
     on_multi_click:
       - timing:
           - ON for at most 300ms
@@ -215,7 +217,8 @@ binary_sensor:
       mode:
         input: true
         pulldown: true
-    internal: true
+    internal: false
+    disabled_by_default: true
     on_multi_click:
       - timing:
           - ON for at most 300ms
@@ -254,7 +257,8 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
-    internal: true
+    internal: false
+    disabled_by_default: true
     on_multi_click:
       - timing:
           - ON for at most 300ms
@@ -293,7 +297,8 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
-    internal: true
+    internal: false
+    disabled_by_default: true
     on_multi_click:
       - timing:
           - ON for at most 300ms
