@@ -1,0 +1,30 @@
+esphome:
+  name: "${name}"
+  friendly_name: Apollo BTN-1
+  comment: Apollo BTN-1
+  name_add_mac_suffix: true
+  platformio_options:
+    board_build.flash_mode: dio
+
+  project:
+    name: "ApolloAutomation.BTN-1"
+    version: "${version}"
+
+  min_version: 2023.11.1
+
+dashboard_import:
+  package_import_url: github://ApolloAutomation/BTN-1/Integrations/ESPHome/BTN-1_Minimal.yaml
+  import_full_config: false
+
+ota:
+  - platform: esphome
+    id: ota_esphome
+
+wifi:
+  ap:
+    ssid: "Apollo BTN-1 Hotspot"
+
+logger:
+
+packages:
+  core: !include Core.yaml

@@ -160,7 +160,7 @@ external_components:
     components: [max17048] #Forked OptionZero
 
 dashboard_import:
-  package_import_url: github://ApolloAutomation/BTN-1/Integrations/ESPHome/BTN-1.yaml
+  package_import_url: github://ApolloAutomation/BTN-1/Integrations/ESPHome/BTN-1_Minimal.yaml
   import_full_config: false
 
 improv_serial:
