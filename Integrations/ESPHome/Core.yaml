@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "25.8.21.1"
+  version: "25.10.9.1"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 esp32:
@@ -100,33 +100,42 @@ event:
     id: button_1_event
     name: Button 1
     event_types:
-      - Single Click
-      - Double Click
-      - Long Press
+      - click
+      - double_click
+      - four_clicks
+      - hold
 
   - platform: template
     id: button_2_event
     name: Button 2
     event_types:
-      - Single Click
-      - Double Click
-      - Long Press
+      - click
+      - double_click
+      - four_clicks
+      - hold
 
   - platform: template
     id: button_3_event
     name: Button 3
     event_types:
-      - Single Click
-      - Double Click
-      - Long Press
+      - click
+      - double_click
+      - four_clicks
+      - hold
 
   - platform: template
     id: button_4_event
     name: Button 4
     event_types:
-      - Single Click
-      - Double Click
-      - Long Press
+      - click
+      - double_click
+      - four_clicks
+      - hold
+
+button:
+  - platform: restart
+    icon: mdi:power-cycle
+    name: "ESP Reboot"
 
 # Button entities for physical buttons
 binary_sensor:
@@ -186,8 +195,7 @@ binary_sensor:
         then:
           - event.trigger:
               id: button_1_event
-              event_type: Single Click
-
+              event_type: click
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
@@ -196,7 +204,7 @@ binary_sensor:
         then:
           - event.trigger:
               id: button_1_event
-              event_type: Double Click
+              event_type: double_click
 
       - timing:
           - ON for 1s to 5s
@@ -204,7 +212,7 @@ binary_sensor:
         then:
           - event.trigger:
               id: button_1_event
-              event_type: Long Press
+              event_type: hold
 
   - platform: gpio
     id: button_2
@@ -222,9 +230,8 @@ binary_sensor:
           - OFF for at least 0.5s
         then:
           - event.trigger:
-              id: button_2_event
-              event_type: Single Click
-
+              id: button_1_event
+              event_type: click
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
@@ -232,16 +239,16 @@ binary_sensor:
           - OFF for at least 0.2s
         then:
           - event.trigger:
-              id: button_2_event
-              event_type: Double Click
+              id: button_1_event
+              event_type: double_click
 
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
         then:
           - event.trigger:
-              id: button_2_event
-              event_type: Long Press
+              id: button_1_event
+              event_type: hold
 
   - platform: gpio
     id: button_3
@@ -261,9 +268,8 @@ binary_sensor:
           - OFF for at least 0.5s
         then:
           - event.trigger:
-              id: button_3_event
-              event_type: Single Click
-
+              id: button_1_event
+              event_type: click
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
@@ -271,16 +277,16 @@ binary_sensor:
           - OFF for at least 0.2s
         then:
           - event.trigger:
-              id: button_3_event
-              event_type: Double Click
+              id: button_1_event
+              event_type: double_click
 
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
         then:
           - event.trigger:
-              id: button_3_event
-              event_type: Long Press
+              id: button_1_event
+              event_type: hold
 
   - platform: gpio
     id: button_4
@@ -299,27 +305,26 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-                - event.trigger:
-                    id: button_4_event
-                    event_type: Single Click
-
+          - event.trigger:
+              id: button_1_event
+              event_type: click
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
           - OFF for at least 0.2s
         then:
-                - event.trigger:
-                    id: button_4_event
-                    event_type: Double Click
+          - event.trigger:
+              id: button_1_event
+              event_type: double_click
 
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
         then:
-                - event.trigger:
-                    id: button_4_event
-                    event_type: Long Press
+          - event.trigger:
+              id: button_1_event
+              event_type: hold
 
   - platform: homeassistant
     name: "OTA Mode"
@@ -342,6 +347,7 @@ sensor:
   - platform: internal_temperature
     name: "ESP Temperature"
     id: sys_esp_temperature
+    disabled_by_default: true
 
   - platform: uptime
     name: Uptime
@@ -389,7 +395,7 @@ switch:
                   id(deep_sleep_1).allow_deep_sleep();
   - platform: factory_reset
     id: factory_reset_switch
-    internal: true
+    disabled_by_default: true
   - platform: gpio
     pin: GPIO19
     name: "Power Latch"
