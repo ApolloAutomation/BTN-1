@@ -206,19 +206,30 @@ binary_sensor:
     name: "Button 2"
     pin:
       number: GPIO4
-
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true   
 
   - <<: *common_button
     id: button_3
     name: "Button 3"
     pin:
       number: GPIO6
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true         
 
   - <<: *common_button
     id: button_4
     name: "Button 4"
     pin:
       number: GPIO5
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true         
 
   - platform: homeassistant
     name: "OTA Mode"
