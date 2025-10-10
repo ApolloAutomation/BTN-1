@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "25.10.10.1"
+  version: "25.10.10.2"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 esp32:
@@ -135,6 +135,7 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+      ignore_strapping_warning: true
     id: reset_button
     on_press:
       then:
