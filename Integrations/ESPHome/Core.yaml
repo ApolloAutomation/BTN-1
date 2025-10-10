@@ -110,11 +110,11 @@ event:
     id: button_2_event
     name: Button 2
 
-   <<: *common_template
+  - <<: *common_template
     id: button_3_event
     name: Button 3
 
-   <<: *common_template
+  - <<: *common_template
     id: button_4_event
     name: Button 4
 
