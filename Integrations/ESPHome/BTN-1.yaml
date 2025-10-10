@@ -1,3 +1,71 @@
+substitutions:
+  name: apollo-btn-1
+  version: "25.10.9.1"
+  device_description: ${name} made by Apollo Automation - version ${version}.
+
+esp32:
+  board: esp32-c6-devkitm-1
+  variant: esp32c6
+  flash_size: 8MB
+  framework:
+    type: esp-idf
+
+api:
+  id: api_server
+  services:
+    - service: play_buzzer
+      variables:
+        song_str: string
+      then:
+        - rtttl.play:
+            rtttl: !lambda 'return song_str;'
+  reboot_timeout: 0s
+  on_client_connected:
+    then:
+      - delay: 5s
+      # Trigger the button that woke up the device
+      - lambda: |-
+          // Get which button woke up the device
+          std::string wake_button = id(wakeup_button_pressed).state;
+          
+          if (wake_button != "0" && wake_button != "") {
+            ESP_LOGI("Apollo", "Client connected - triggering wake button %s", wake_button.c_str());
+            
+            // Trigger the corresponding binary sensor
+            if (wake_button == "1") {
+              id(button_1_event).trigger("Single Click");
+            } else if (wake_button == "2") {
+              id(button_2_event).trigger("Single Click");
+            } else if (wake_button == "3") {
+              id(button_3_event).trigger("Single Click");
+            } else if (wake_button == "4") {
+              id(button_4_event).trigger("Single Click");
+            }
+            id(wakeup_button_pressed).publish_state("0");
+          }
+
+      # Send Wake up Button State
+      - component.update: wakeup_button_pressed
+
+      # Check OTA Switch
+      - delay: 3s
+      - if:
+          condition:
+            or:
+              - binary_sensor.is_on: ota_mode
+              - switch.is_on: prevent_sleep
+          then:
+            - lambda: |- 
+                ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA Or Switch");
+                id(deep_sleep_1).prevent_deep_sleep(); 
+          else: 
+            - lambda: |-
+                id(reportAllValues).execute();
+            - delay: 2s
+            - deep_sleep.enter:
+                id: deep_sleep_1            
+
+
 esphome:
   name: apollo-btn-1
   friendly_name: Apollo BTN-1
@@ -106,53 +174,6 @@ esphome:
     - switch.turn_off: accessory_power
     - switch.turn_off: power_latch
 
-api:
-  reboot_timeout: 0s
-  on_client_connected:
-    then:
-      - delay: 5s
-      # Trigger the button that woke up the device
-      - lambda: |-
-          // Get which button woke up the device
-          std::string wake_button = id(wakeup_button_pressed).state;
-          
-          if (wake_button != "0" && wake_button != "") {
-            ESP_LOGI("Apollo", "Client connected - triggering wake button %s", wake_button.c_str());
-            
-            // Trigger the corresponding binary sensor
-            if (wake_button == "1") {
-              id(button_1_event).trigger("Single Click");
-            } else if (wake_button == "2") {
-              id(button_2_event).trigger("Single Click");
-            } else if (wake_button == "3") {
-              id(button_3_event).trigger("Single Click");
-            } else if (wake_button == "4") {
-              id(button_4_event).trigger("Single Click");
-            }
-            id(wakeup_button_pressed).publish_state("0");
-          }
-
-      # Send Wake up Button State
-      - component.update: wakeup_button_pressed
-
-      # Check OTA Switch
-      - delay: 3s
-      - if:
-          condition:
-            or:
-              - binary_sensor.is_on: ota_mode
-              - switch.is_on: prevent_sleep
-          then:
-            - lambda: |- 
-                ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA Or Switch");
-                id(deep_sleep_1).prevent_deep_sleep(); 
-          else: 
-            - lambda: |-
-                id(reportAllValues).execute();
-            - delay: 2s
-            - deep_sleep.enter:
-                id: deep_sleep_1
-
 external_components:
   - source: github://ApolloAutomation/ExternalComponents
     components: [deep_sleep]
@@ -196,5 +217,407 @@ wifi:
 
 logger:
 
-packages:
-  core: !include Core.yaml
+globals:
+  - id: cycleCounter
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: button_press_timestamp
+    restore_value: no
+    type: uint32_t
+    initial_value: '0'
+
+captive_portal:
+  id: captive_portal_instance
+
+web_server:
+  id: web_server_instance
+  port: 80
+
+i2c:
+  id: i2c_bus
+  sda: GPIO1
+  scl: GPIO0
+
+# Buzzer
+output:
+  - platform: ledc
+    pin: GPIO23
+    id: buzzer
+rtttl:
+  id: rtttl_buzzer
+  output: buzzer
+
+
+deep_sleep:
+  id: deep_sleep_1
+  sleep_duration: 24h
+  run_duration: 90s
+  esp32_ext1_wakeup:
+    mode: ANY_HIGH
+    pins:
+      - number: GPIO2
+        allow_other_uses: true
+      - number: GPIO4
+        allow_other_uses: true
+      - number: GPIO5
+        allow_other_uses: true
+      - number: GPIO6
+        allow_other_uses: true
+
+number:
+  - platform: template
+    name: "Sleep Duration"
+    id: deep_sleep_sleep_duration
+    min_value: 0
+    max_value: 800
+    step: 1
+    mode: box
+    update_interval: never
+    optimistic: true
+    restore_value: true
+    initial_value: 24
+    icon: "mdi:arrow-collapse-right"
+    entity_category: CONFIG
+    unit_of_measurement: "h"
+    on_value:
+      then:
+        - lambda: |-
+            id(deep_sleep_1).set_sleep_duration(x * 60 * 60 * 1000);
+
+# Wake-up detection sensors
+text_sensor:
+  - platform: template
+    id: wakeup_button_pressed
+    name: "Wake-up Button Pressed"
+    icon: "mdi:gesture-tap-button"
+
+event:
+  - &common_template
+      platform: template
+      id: button_1_event
+      name: Button 1
+      event_types:
+        - click
+        - double_click
+        - four_clicks
+        - hold
+
+  - <<: *common_template
+    id: button_2_event
+    name: Button 2
+
+  - <<: *common_template
+    id: button_3_event
+    name: Button 3
+
+  - <<: *common_template
+    id: button_4_event
+    name: Button 4
+
+button:
+  - platform: restart
+    icon: mdi:power-cycle
+    name: "ESP Reboot"
+
+# Button entities for physical buttons
+binary_sensor:
+  - platform: status
+    name: Online
+    id: ink_ha_connected
+  - platform: gpio
+    pin: 
+      number: GPIO9
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    id: reset_button
+    on_press:
+      then:
+        - lambda: |-
+            id(button_press_timestamp) = millis();    
+    on_release:
+      then:
+        - lambda: |-
+            if (millis() - id(button_press_timestamp) >= 10000) {
+              // Remove Wifi
+              // id(testCycleCount) = 0;
+              // id(runTest) = true;
+              id(prevent_sleep).turn_on();
+              id(factory_reset_switch).turn_on();
+            }
+            else if (millis() - id(button_press_timestamp) >= 3000) {
+              //Turn Prevent Sleep On
+              id(prevent_sleep).turn_on();
+              //Prevent Sleep
+              id(deep_sleep_1).prevent_deep_sleep();
+            }
+            else {
+              // StatusCheck
+              id(statusCheck).execute();
+              delay(3000);
+              // id(testCycleCount) = 0;
+              // id(runTest) = true;
+              // id(testScript).execute();
+            }
+  - &common_button
+      platform: gpio
+      id: button_1
+      name: "Button 1"
+      pin:
+        number: GPIO2
+        allow_other_uses: true
+        mode:
+          input: true
+          pulldown: true
+      internal: true
+      on_multi_click:
+        - timing:
+            - ON for at most 300ms
+            - OFF for at least 0.5s
+          then:
+            - event.trigger:
+                id: button_1_event
+                event_type: click
+        - timing:
+            - ON for at most 300ms
+            - OFF for at most 0.5s
+            - ON for at most 300ms
+            - OFF for at least 0.2s
+          then:
+            - event.trigger:
+                id: button_1_event
+                event_type: double_click
+  
+        - timing:
+            - ON for 1s to 5s
+            - OFF for at least 0.5s
+          then:
+            - event.trigger:
+                id: button_1_event
+                event_type: hold
+
+  - <<: *common_button
+    id: button_2
+    name: "Button 2"
+    pin:
+      number: GPIO4
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+
+  - <<: *common_button
+    id: button_3
+    name: "Button 3"
+    pin:
+      number: GPIO6
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true      
+
+  - <<: *common_button
+    id: button_4
+    name: "Button 4"
+    pin:
+      number: GPIO5
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true      
+
+  - platform: homeassistant
+    name: "OTA Mode"
+    id: ota_mode
+    entity_id: input_boolean.apollo_ota_mode
+    on_press:
+      then:
+        - lambda: |-
+            id(deep_sleep_1).prevent_deep_sleep();
+    on_release:
+      then:
+        - if:
+            condition:
+              switch.is_off: prevent_sleep
+            then:
+              - lambda: |-
+                  id(deep_sleep_1).allow_deep_sleep();
+
+sensor:
+  - platform: internal_temperature
+    name: "ESP Temperature"
+    id: sys_esp_temperature
+    disabled_by_default: true
+
+  - platform: uptime
+    name: Uptime
+    id: sys_uptime
+    update_interval: 60s
+
+  - platform: wifi_signal
+    name: RSSI
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: "diagnostic"
+
+  - platform: max17048
+    id: max_17048
+    battery_voltage:
+      name: Battery voltage
+      id: batt_v
+    battery_level:
+      name: Battery level
+      id: batt_pct
+      filters:
+        - lambda: |
+            if (x > 100) return 100;
+            else return (x);
+
+switch:
+  - platform: template
+    name: "Prevent Sleep"
+    id: prevent_sleep
+    icon: mdi:sleep
+    restore_mode: RESTORE_DEFAULT_ON
+    optimistic: true
+    entity_category: "config"
+    on_turn_on:
+      then:
+        - lambda: |-
+            id(deep_sleep_1).prevent_deep_sleep();
+    on_turn_off:
+      then:
+        - if:
+            condition:
+              binary_sensor.is_off: ota_mode
+            then:
+              - lambda: |-
+                  id(deep_sleep_1).allow_deep_sleep();
+  - platform: factory_reset
+    id: factory_reset_switch
+    disabled_by_default: true
+  - platform: gpio
+    pin: GPIO19
+    name: "Power Latch"
+    id: power_latch
+    restore_mode: ALWAYS_ON
+    setup_priority: 2000
+    internal: true
+  - platform: gpio
+    pin: GPIO18
+    name: "Accessory Power"
+    id: accessory_power
+    restore_mode: ALWAYS_ON
+    setup_priority: 2000
+    internal: true
+
+light:
+  - &common_light
+      platform: partition
+      name: "BTN 1 Light"
+      default_transition_length: 0s
+      segments:
+        - id: rgb_light
+          from: 0
+          to: 0
+      effects:
+        - pulse:
+            name: "Slow Pulse"
+            transition_length: 1000ms
+            update_interval: 1000ms
+            min_brightness: 0%
+            max_brightness: 100%
+        - pulse:
+            name: "Fast Blink"
+            transition_length: 100ms
+            update_interval: 100ms
+            min_brightness: 50%
+            max_brightness: 100%
+  - <<: *common_light
+    name: "BTN 2 Light"
+    segments:
+      - id: rgb_light
+        from: 1
+        to: 1
+  - <<: *common_light
+    name: "BTN 3 Light"
+    segments:
+      - id: rgb_light
+        from: 2
+        to: 2
+  - <<: *common_light
+    name: "BTN 4 Light"
+    segments:
+      - id: rgb_light
+        from: 3
+        to: 3
+  - platform: esp32_rmt_led_strip
+    id: rgb_light
+    name: "RGB Light"
+    pin: GPIO21
+    default_transition_length: 0s
+    chipset: WS2812
+    num_leds: 4
+    rgb_order: grb
+    internal: true
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
+
+
+script:
+  - id: statusCheck
+    then:
+      - if:
+          condition:
+            - lambda: 'return id(ink_ha_connected).state;'
+          then:
+            - logger.log: "Apollo Automation: Connected To HA"
+            - light.turn_on: 
+                id: rgb_light
+                brightness: 100%
+                red: 0%
+                green: 0%
+                blue: 100%
+          else:
+            - if:
+                condition:
+                  - wifi.connected
+                then:
+                  - logger.log: "Apollo Automation: Connected To Wifi"
+                  - light.turn_on: 
+                      id: rgb_light
+                      brightness: 100%
+                      red: 0%
+                      green: 100%
+                      blue: 0%
+                else:
+                  - logger.log: "Apollo Automation: Not Connected To Wifi"
+                  - light.turn_on: 
+                      id: rgb_light
+                      brightness: 100%
+                      red: 100%
+                      green: 100%
+                      blue: 0%
+      - delay: 5s
+      - light.turn_off: rgb_light
+  - id: reportAllValues
+    then:
+      - component.update: wifi_signal_db
+      - component.update: sys_esp_temperature
+      - component.update: sys_uptime
+      - component.update: wakeup_button_pressed
+
+      
