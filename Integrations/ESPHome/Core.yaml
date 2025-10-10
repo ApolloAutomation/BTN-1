@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "25.8.21.1"
+  version: "25.10.10.1"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 esp32:
