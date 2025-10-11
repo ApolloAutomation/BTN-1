@@ -1,7 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "25.10.10.1"
-
+  version: "25.10.10.2"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 esp32:
@@ -97,41 +96,27 @@ text_sensor:
     icon: "mdi:gesture-tap-button"
 
 event:
-  - platform: template
-    id: button_1_event
-    name: Button 1
-    event_types:
-      - click
-      - double_click
-      - four_clicks
-      - hold
+  - &common_template
+      platform: template
+      id: button_1_event
+      name: Button 1
+      event_types:
+        - click
+        - double_click
+        - four_clicks
+        - hold
 
-  - platform: template
+  - <<: *common_template
     id: button_2_event
     name: Button 2
-    event_types:
-      - click
-      - double_click
-      - four_clicks
-      - hold
 
-  - platform: template
+  - <<: *common_template
     id: button_3_event
     name: Button 3
-    event_types:
-      - click
-      - double_click
-      - four_clicks
-      - hold
 
-  - platform: template
+  - <<: *common_template
     id: button_4_event
     name: Button 4
-    event_types:
-      - click
-      - double_click
-      - four_clicks
-      - hold
 
 button:
   - platform: restart
@@ -180,43 +165,44 @@ binary_sensor:
               // id(runTest) = true;
               // id(testScript).execute();
             }
-  - platform: gpio
-    id: button_1
-    name: "Button 1"
-    pin:
-      number: GPIO2
-      allow_other_uses: true
-      mode:
-        input: true
-        pulldown: true
-    internal: true
-    on_multi_click:
-      - timing:
-          - ON for at most 300ms
-          - OFF for at least 0.5s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: click
-      - timing:
-          - ON for at most 300ms
-          - OFF for at most 0.5s
-          - ON for at most 300ms
-          - OFF for at least 0.2s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: double_click
+  - &common_button
+      platform: gpio
+      id: button_1
+      name: "Button 1"
+      pin:
+        number: GPIO2
+        allow_other_uses: true
+        mode:
+          input: true
+          pulldown: true
+      internal: true
+      on_multi_click:
+        - timing:
+            - ON for at most 300ms
+            - OFF for at least 0.5s
+          then:
+            - event.trigger:
+                id: button_1_event
+                event_type: click
+        - timing:
+            - ON for at most 300ms
+            - OFF for at most 0.5s
+            - ON for at most 300ms
+            - OFF for at least 0.2s
+          then:
+            - event.trigger:
+                id: button_1_event
+                event_type: double_click
+  
+        - timing:
+            - ON for 1s to 5s
+            - OFF for at least 0.5s
+          then:
+            - event.trigger:
+                id: button_1_event
+                event_type: hold
 
-      - timing:
-          - ON for 1s to 5s
-          - OFF for at least 0.5s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: hold
-
-  - platform: gpio
+  - <<: *common_button
     id: button_2
     name: "Button 2"
     pin:
@@ -224,35 +210,9 @@ binary_sensor:
       allow_other_uses: true
       mode:
         input: true
-        pulldown: true
-    internal: true
-    on_multi_click:
-      - timing:
-          - ON for at most 300ms
-          - OFF for at least 0.5s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: click
-      - timing:
-          - ON for at most 300ms
-          - OFF for at most 0.5s
-          - ON for at most 300ms
-          - OFF for at least 0.2s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: double_click
+        pulldown: true   
 
-      - timing:
-          - ON for 1s to 5s
-          - OFF for at least 0.5s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: hold
-
-  - platform: gpio
+  - <<: *common_button
     id: button_3
     name: "Button 3"
     pin:
@@ -260,37 +220,9 @@ binary_sensor:
       allow_other_uses: true
       mode:
         input: true
-        pulldown: true
-    filters:
-      - delayed_off: 10ms
-    internal: true
-    on_multi_click:
-      - timing:
-          - ON for at most 300ms
-          - OFF for at least 0.5s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: click
-      - timing:
-          - ON for at most 300ms
-          - OFF for at most 0.5s
-          - ON for at most 300ms
-          - OFF for at least 0.2s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: double_click
+        pulldown: true         
 
-      - timing:
-          - ON for 1s to 5s
-          - OFF for at least 0.5s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: hold
-
-  - platform: gpio
+  - <<: *common_button
     id: button_4
     name: "Button 4"
     pin:
@@ -298,35 +230,7 @@ binary_sensor:
       allow_other_uses: true
       mode:
         input: true
-        pulldown: true
-    filters:
-      - delayed_off: 10ms
-    internal: true
-    on_multi_click:
-      - timing:
-          - ON for at most 300ms
-          - OFF for at least 0.5s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: click
-      - timing:
-          - ON for at most 300ms
-          - OFF for at most 0.5s
-          - ON for at most 300ms
-          - OFF for at least 0.2s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: double_click
-
-      - timing:
-          - ON for 1s to 5s
-          - OFF for at least 0.5s
-        then:
-          - event.trigger:
-              id: button_1_event
-              event_type: hold
+        pulldown: true         
 
   - platform: homeassistant
     name: "OTA Mode"
@@ -414,86 +318,45 @@ switch:
     internal: true
 
 light:
-  - platform: partition
-    name: "BTN 1 Light"
-    default_transition_length: 0s
-    segments:
-      - id: rgb_light
-        from: 0
-        to: 0
-    effects:
-      - pulse:
-          name: "Slow Pulse"
-          transition_length: 1000ms
-          update_interval: 1000ms
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Fast Blink"
-          transition_length: 100ms
-          update_interval: 100ms
-          min_brightness: 50%
-          max_brightness: 100%
-  - platform: partition
+  - &common_light
+      platform: partition
+      name: "BTN 1 Light"
+      default_transition_length: 0s
+      segments:
+        - id: rgb_light
+          from: 0
+          to: 0
+      effects:
+        - pulse:
+            name: "Slow Pulse"
+            transition_length: 1000ms
+            update_interval: 1000ms
+            min_brightness: 0%
+            max_brightness: 100%
+        - pulse:
+            name: "Fast Blink"
+            transition_length: 100ms
+            update_interval: 100ms
+            min_brightness: 50%
+            max_brightness: 100%
+  - <<: *common_light
     name: "BTN 2 Light"
-    default_transition_length: 0s
     segments:
       - id: rgb_light
         from: 1
         to: 1
-    effects:
-      - pulse:
-          name: "Slow Pulse"
-          transition_length: 1000ms
-          update_interval: 1000ms
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Fast Blink"
-          transition_length: 100ms
-          update_interval: 100ms
-          min_brightness: 50%
-          max_brightness: 100%
-  - platform: partition
+  - <<: *common_light
     name: "BTN 3 Light"
-    default_transition_length: 0s
     segments:
       - id: rgb_light
         from: 2
         to: 2
-    effects:
-      - pulse:
-          name: "Slow Pulse"
-          transition_length: 1000ms
-          update_interval: 1000ms
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Fast Blink"
-          transition_length: 100ms
-          update_interval: 100ms
-          min_brightness: 50%
-          max_brightness: 100%
-  - platform: partition
+  - <<: *common_light
     name: "BTN 4 Light"
-    default_transition_length: 0s
     segments:
       - id: rgb_light
         from: 3
         to: 3
-    effects:
-      - pulse:
-          name: "Slow Pulse"
-          transition_length: 1000ms
-          update_interval: 1000ms
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Fast Blink"
-          transition_length: 100ms
-          update_interval: 100ms
-          min_brightness: 50%
-          max_brightness: 100%
   - platform: esp32_rmt_led_strip
     id: rgb_light
     name: "RGB Light"
