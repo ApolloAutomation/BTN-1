@@ -188,6 +188,8 @@ binary_sensor:
       mode:
         input: true
         pulldown: true
+    filters:
+      - delayed_off: 10ms
     internal: true
     on_multi_click:
       - timing:
@@ -236,49 +238,47 @@ binary_sensor:
       mode:
         input: true
         pulldown: true
+    filters:
+      - delayed_off: 10ms
     internal: true
     on_multi_click:
       # Put the longest pattern first
       - timing:
-          - ON  for at most 250ms
+          - ON for at most 250ms
           - OFF for at most 350ms
-          - ON  for at most 250ms
+          - ON for at most 250ms
           - OFF for at most 350ms
-          - ON  for at most 250ms
+          - ON for at most 250ms
           - OFF for at most 350ms
-          - ON  for at most 250ms
+          - ON for at most 250ms
           - OFF for at least 600ms
         then:
           - event.trigger:
               id: button_2_event
               event_type: four_clicks
-
       - timing:
-          - ON  for at most 300ms
+          - ON for at most 300ms
           - OFF for at most 400ms
-          - ON  for at most 300ms
+          - ON for at most 300ms
           - OFF for at least 500ms
         then:
           - event.trigger:
               id: button_2_event
               event_type: double_click
-
       - timing:
-          - ON  for at most 300ms
+          - ON for at most 300ms
           - OFF for at least 500ms
         then:
           - event.trigger:
               id: button_2_event
               event_type: click
-
       - timing:
-          - ON  for 1s to 5s
+          - ON for 1s to 5s
           - OFF for at least 500ms
         then:
           - event.trigger:
               id: button_2_event
               event_type: hold
-
 
   - platform: gpio
     id: button_3
