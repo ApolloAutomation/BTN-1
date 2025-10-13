@@ -240,11 +240,8 @@ binary_sensor:
         pulldown: true
     internal: true
     filters:
-      - debounce: 10ms
       - delayed_off: 10ms
-
     on_multi_click:
-      # Four clicks FIRST
       - timing:
           - ON  for at most 300ms
           - OFF for at most 450ms
