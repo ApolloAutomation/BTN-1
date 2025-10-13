@@ -237,10 +237,6 @@ binary_sensor:
         input: true
         pulldown: true
     internal: true
-    # Optional but recommended for reliability
-    filters:
-      - debounce: 10ms
-
     on_multi_click:
       # Put the longest pattern first
       - timing:
