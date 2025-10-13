@@ -238,43 +238,48 @@ binary_sensor:
       mode:
         input: true
         pulldown: true
-    filters:
-      - delayed_off: 10ms
     internal: true
+    filters:
+      - debounce: 10ms
+      - delayed_off: 10ms
+
     on_multi_click:
-      # Put the longest pattern first
+      # Four clicks FIRST
       - timing:
-          - ON for at most 250ms
-          - OFF for at most 350ms
-          - ON for at most 250ms
-          - OFF for at most 350ms
-          - ON for at most 250ms
-          - OFF for at most 350ms
-          - ON for at most 250ms
-          - OFF for at least 600ms
+          - ON  for at most 300ms
+          - OFF for at most 450ms
+          - ON  for at most 300ms
+          - OFF for at most 450ms
+          - ON  for at most 300ms
+          - OFF for at most 450ms
+          - ON  for at most 300ms
+          - OFF for at least 700ms
         then:
           - event.trigger:
               id: button_2_event
               event_type: four_clicks
+
       - timing:
-          - ON for at most 300ms
-          - OFF for at most 400ms
-          - ON for at most 300ms
-          - OFF for at least 500ms
+          - ON  for at most 300ms
+          - OFF for at most 450ms
+          - ON  for at most 300ms
+          - OFF for at least 600ms
         then:
           - event.trigger:
               id: button_2_event
               event_type: double_click
+
       - timing:
-          - ON for at most 300ms
-          - OFF for at least 500ms
+          - ON  for at most 300ms
+          - OFF for at least 600ms
         then:
           - event.trigger:
               id: button_2_event
               event_type: click
+
       - timing:
-          - ON for 1s to 5s
-          - OFF for at least 500ms
+          - ON  for 1s to 5s
+          - OFF for at least 600ms
         then:
           - event.trigger:
               id: button_2_event
