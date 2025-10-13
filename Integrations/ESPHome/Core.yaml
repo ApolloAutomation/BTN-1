@@ -238,45 +238,42 @@ binary_sensor:
       mode:
         input: true
         pulldown: true
-    internal: true
     filters:
       - delayed_off: 10ms
+    internal: true
     on_multi_click:
       - timing:
-          - ON  for at most 300ms
-          - OFF for at most 450ms
-          - ON  for at most 300ms
-          - OFF for at most 450ms
-          - ON  for at most 300ms
-          - OFF for at most 450ms
-          - ON  for at most 300ms
-          - OFF for at least 700ms
-        then:
-          - event.trigger:
-              id: button_2_event
-              event_type: four_clicks
-
-      - timing:
-          - ON  for at most 300ms
-          - OFF for at most 450ms
-          - ON  for at most 300ms
-          - OFF for at least 600ms
-        then:
-          - event.trigger:
-              id: button_2_event
-              event_type: double_click
-
-      - timing:
-          - ON  for at most 300ms
-          - OFF for at least 600ms
+          - ON for at most 300ms
+          - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_2_event
               event_type: click
-
       - timing:
-          - ON  for 1s to 5s
-          - OFF for at least 600ms
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+          - event.trigger:
+              id: button_2_event
+              event_type: double_click
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_2_event
+              event_type: four_clicks
+      - timing:
+          - ON for 1s to 5s
+          - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_2_event
