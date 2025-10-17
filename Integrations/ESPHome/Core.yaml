@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "25.10.10.2"
+  version: "25.10.17.1"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 esp32:
@@ -96,27 +96,41 @@ text_sensor:
     icon: "mdi:gesture-tap-button"
 
 event:
-  - &common_template
-      platform: template
-      id: button_1_event
-      name: Button 1
-      event_types:
-        - click
-        - double_click
-        - four_clicks
-        - hold
+  - platform: template
+    id: button_1_event
+    name: Button 1
+    event_types:
+      - click
+      - double_click
+      - triple_click
+      - hold
 
-  - <<: *common_template
+  - platform: template
     id: button_2_event
     name: Button 2
+    event_types:
+      - click
+      - double_click
+      - triple_click
+      - hold
 
-  - <<: *common_template
+  - platform: template
     id: button_3_event
     name: Button 3
+    event_types:
+      - click
+      - double_click
+      - triple_click
+      - hold
 
-  - <<: *common_template
+  - platform: template
     id: button_4_event
     name: Button 4
+    event_types:
+      - click
+      - double_click
+      - triple_click
+      - hold
 
 button:
   - platform: restart
@@ -165,44 +179,55 @@ binary_sensor:
               // id(runTest) = true;
               // id(testScript).execute();
             }
-  - &common_button
-      platform: gpio
-      id: button_1
-      name: "Button 1"
-      pin:
-        number: GPIO2
-        allow_other_uses: true
-        mode:
-          input: true
-          pulldown: true
-      internal: true
-      on_multi_click:
-        - timing:
-            - ON for at most 300ms
-            - OFF for at least 0.5s
-          then:
-            - event.trigger:
-                id: button_1_event
-                event_type: click
-        - timing:
-            - ON for at most 300ms
-            - OFF for at most 0.5s
-            - ON for at most 300ms
-            - OFF for at least 0.2s
-          then:
-            - event.trigger:
-                id: button_1_event
-                event_type: double_click
-  
-        - timing:
-            - ON for 1s to 5s
-            - OFF for at least 0.5s
-          then:
-            - event.trigger:
-                id: button_1_event
-                event_type: hold
+  - platform: gpio
+    id: button_1
+    name: "Button 1"
+    pin:
+      number: GPIO2
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+    internal: true
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_1_event
+              event_type: click
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+          - event.trigger:
+              id: button_1_event
+              event_type: double_click
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_1_event
+              event_type: triple_click
+      - timing:
+          - ON for 1s to 5s
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_1_event
+              event_type: hold
 
-  - <<: *common_button
+  - platform: gpio
     id: button_2
     name: "Button 2"
     pin:
@@ -210,9 +235,47 @@ binary_sensor:
       allow_other_uses: true
       mode:
         input: true
-        pulldown: true   
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+    internal: true
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_2_event
+              event_type: click
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+          - event.trigger:
+              id: button_2_event
+              event_type: double_click
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_2_event
+              event_type: triple_click
+      - timing:
+          - ON for 1s to 5s
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_2_event
+              event_type: hold
 
-  - <<: *common_button
+  - platform: gpio
     id: button_3
     name: "Button 3"
     pin:
@@ -220,9 +283,47 @@ binary_sensor:
       allow_other_uses: true
       mode:
         input: true
-        pulldown: true         
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+    internal: true
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_3_event
+              event_type: click
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+          - event.trigger:
+              id: button_3_event
+              event_type: double_click
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_3_event
+              event_type: triple_click
+      - timing:
+          - ON for 1s to 5s
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_3_event
+              event_type: hold
 
-  - <<: *common_button
+  - platform: gpio
     id: button_4
     name: "Button 4"
     pin:
@@ -230,7 +331,45 @@ binary_sensor:
       allow_other_uses: true
       mode:
         input: true
-        pulldown: true         
+        pulldown: true
+    filters:
+      - delayed_off: 10ms
+    internal: true
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_4_event
+              event_type: click
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+          - event.trigger:
+              id: button_4_event
+              event_type: double_click
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_4_event
+              event_type: triple_click
+      - timing:
+          - ON for 1s to 5s
+          - OFF for at least 0.5s
+        then:
+          - event.trigger:
+              id: button_4_event
+              event_type: hold
 
   - platform: homeassistant
     name: "OTA Mode"
