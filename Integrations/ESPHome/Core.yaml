@@ -212,9 +212,9 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.5s
+          - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.5s
+          - OFF for at most 0.5s
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
@@ -262,9 +262,9 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.5s
+          - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.5s
+          - OFF for at most 0.5s
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
@@ -312,9 +312,9 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.5s
+          - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.5s
+          - OFF for at most 0.5s
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
@@ -362,9 +362,9 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.5s
+          - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.5s
+          - OFF for at most 0.5s
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
