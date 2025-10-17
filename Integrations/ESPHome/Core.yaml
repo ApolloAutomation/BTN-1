@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "25.10.13.1"
+  version: "25.10.17.1"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 esp32:
@@ -102,7 +102,7 @@ event:
     event_types:
       - click
       - double_click
-      - four_clicks
+      - triple_click
       - hold
 
   - platform: template
@@ -111,7 +111,7 @@ event:
     event_types:
       - click
       - double_click
-      - four_clicks
+      - triple_click
       - hold
 
   - platform: template
@@ -120,7 +120,7 @@ event:
     event_types:
       - click
       - double_click
-      - four_clicks
+      - triple_click
       - hold
 
   - platform: template
@@ -129,7 +129,7 @@ event:
     event_types:
       - click
       - double_click
-      - four_clicks
+      - triple_click
       - hold
 
 button:
@@ -220,7 +220,7 @@ binary_sensor:
         then:
           - event.trigger:
               id: button_1_event
-              event_type: four_clicks
+              event_type: triple_click
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
@@ -264,13 +264,11 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at most 0.5s
-          - ON for at most 300ms
           - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_2_event
-              event_type: four_clicks
+              event_type: triple_click
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
@@ -314,13 +312,11 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at most 0.5s
-          - ON for at most 300ms
           - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_3_event
-              event_type: four_clicks
+              event_type: triple_click
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
@@ -364,13 +360,11 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at most 0.5s
-          - ON for at most 300ms
           - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_4_event
-              event_type: four_clicks
+              event_type: triple_click
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
