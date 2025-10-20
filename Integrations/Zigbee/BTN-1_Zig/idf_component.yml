@@ -1,0 +1,29 @@
+## IDF Component Manager Manifest File
+## Required by IDF build system for component management
+
+description: "BTN-1 Zigbee Firmware Components"
+
+dependencies:
+  # ESP-Zigbee library - provides Zigbee protocol stack
+  espressif/esp-zigbee-lib:
+    version: "~1.2.1"
+  
+  # ESP-ZBOSS library - Zigbee stack implementation
+  espressif/esp-zboss-lib:
+    version: "~1.2.1"
+    
+  # Minimum IDF version requirement
+  idf:
+    version: ">=5.1.0"
+
+# Component metadata
+metadata:
+  project_name: "BTN-1 Zigbee"
+  version: "1.0.0"
+  
+# Target configuration
+targets:
+  - esp32c6
+
+# Component configuration
+component_hash: null
