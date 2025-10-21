@@ -99,13 +99,13 @@ api:
             
             // Trigger the corresponding binary sensor
             if (wake_button == "1") {
-              id(button_1_event).trigger("Single Click");
+              id(button_1_event).trigger("click");
             } else if (wake_button == "2") {
-              id(button_2_event).trigger("Single Click");
+              id(button_2_event).trigger("click");
             } else if (wake_button == "3") {
-              id(button_3_event).trigger("Single Click");
+              id(button_3_event).trigger("click");
             } else if (wake_button == "4") {
-              id(button_4_event).trigger("Single Click");
+              id(button_4_event).trigger("click");
             }
             id(wakeup_button_pressed).publish_state("0");
           }
