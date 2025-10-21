@@ -34,42 +34,7 @@ esphome:
                   ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA On Boot");
                   id(deep_sleep_1).prevent_deep_sleep();
     
-    # Check button states for powered-off scenario
-    - priority: 800
-      then:
-        - lambda: |-
-            // Check if we have a valid deep sleep wake-up source
-            uint64_t wake = esp_sleep_get_ext1_wakeup_status();
-            
-            // If wake is 0, we didn't wake from deep sleep (powered-off scenario)
-            if (wake == 0) {
-              ESP_LOGI("Apollo", "No deep sleep wake detected, checking button states directly");
-              
-              // Check each button state
-              // Buttons are active HIGH (pressed = HIGH/1)
-              if (gpio_get_level(GPIO_NUM_2) == 1) {
-                ESP_LOGI("Apollo", "Button 1 (GPIO2) is pressed");
-                id(wakeup_button_pressed).publish_state("1");
-              }
-              else if (gpio_get_level(GPIO_NUM_4) == 1) {
-                ESP_LOGI("Apollo", "Button 2 (GPIO4) is pressed");
-                id(wakeup_button_pressed).publish_state("2");
-              }
-              else if (gpio_get_level(GPIO_NUM_6) == 1) {
-                ESP_LOGI("Apollo", "Button 3 (GPIO6) is pressed");
-                id(wakeup_button_pressed).publish_state("3");
-              }
-              else if (gpio_get_level(GPIO_NUM_5) == 1) {
-                ESP_LOGI("Apollo", "Button 4 (GPIO5) is pressed");
-                id(wakeup_button_pressed).publish_state("4");
-              }
-              else {
-                ESP_LOGI("Apollo", "No button press detected in powered-off scenario");
-                // Don't set to "0" yet, let the deep sleep logic handle it
-              }
-            }
-    
-    - priority: -100
+    - priority: -900
       then:
       - lambda: |-
           uint64_t wake = esp_sleep_get_ext1_wakeup_status();
