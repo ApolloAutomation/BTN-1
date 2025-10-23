@@ -7,6 +7,7 @@
 #define ZIGBEE_DEVICE_H
 
 #include "esp_zigbee_core.h"
+#include "button_handler.h"  /* For button_event_t */
 
 /* Device configuration */
 #define ESP_ZB_HA_ON_OFF_SWITCH_DEVICE_ID       0x0000  /* Generic On/Off switch */
@@ -46,10 +47,8 @@ esp_zb_ep_list_t *btn1_ep_create(void);
 void btn1_configure_reporting(void);
 void btn1_zigbee_init(void);
 
-/* Forward declaration for button_event_t from button_handler.h */
-typedef struct button_event_t button_event_t;
-
 /* Button event handler - defined in zigbee_device.c */
+/* Note: button_event_t is defined in button_handler.h */
 void btn1_button_event_handler(button_event_t *event);
 
 /* Binding management functions */

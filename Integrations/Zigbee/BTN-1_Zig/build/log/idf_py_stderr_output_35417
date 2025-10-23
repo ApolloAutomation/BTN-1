@@ -1,0 +1,10 @@
+CMake Deprecation Warning at /Users/justinapollo/esp/v5.2.1/esp-idf/components/mbedtls/mbedtls/CMakeLists.txt:21 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+a322e6bdad-af7fd7b-1.5.1-2025-10-23 17:56:37 UTC

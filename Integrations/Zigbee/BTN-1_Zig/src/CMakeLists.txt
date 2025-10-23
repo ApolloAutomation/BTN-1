@@ -1,5 +1,7 @@
-# BTN-1 Zigbee Source Component
+# Get build time
+string(TIMESTAMP BUILD_TIME_UTC "%Y-%m-%d %H:%M:%S" UTC)
 
+# Component configuration
 idf_component_register(
     SRCS
         "main.c"
@@ -19,7 +21,7 @@ idf_component_register(
         driver
         esp_timer
         esp_system
-        esp_log
+        log
         app_update
     
     PRIV_REQUIRES
@@ -33,10 +35,7 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-format" APPEND)
 # Define component-specific compiler flags
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-unused-variable -Wno-unused-function)
 
-# Ensure proper linking of Zigbee libraries
-target_link_libraries(${COMPONENT_LIB} INTERFACE esp-zigbee-lib)
-
-# Add any component-specific definitions
+# Add component-specific definitions
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
     BTN1_FIRMWARE_VERSION="1.0.0"
     BTN1_BUILD_TIME="${BUILD_TIME_UTC}"

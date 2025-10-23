@@ -1,0 +1,56 @@
+[1/5] cd /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/esp-idf/esptool_py && /Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/bin/python /Users/justinapollo/esp/v5.2.1/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/partition_table/partition-table.bin /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/BTN-1_Zig.bin
+BTN-1_Zig.bin binary size 0x90870 bytes. Smallest app partition is 0x1e0000 bytes. 0x14f790 bytes (70%) free.
+[2/5] Performing build step for 'bootloader'
+[1/1] cd /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/bootloader/esp-idf/esptool_py && /Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/bin/python /Users/justinapollo/esp/v5.2.1/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/bootloader/bootloader.bin
+Bootloader binary size 0x5410 bytes. 0x2bf0 bytes (34%) free.
+[3/5] No install step for 'bootloader'
+[4/5] Completed 'bootloader'
+[4/5] cd /Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py && /opt/homebrew/bin/cmake -D IDF_PATH=/Users/justinapollo/esp/v5.2.1/esp-idf -D "SERIAL_TOOL=/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/bin/python;;/Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py/esptool/esptool.py;--chip;esp32c6" -D "SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args" -D WORKING_DIRECTORY=/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build -P /Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py/run_serial_tool.cmake
+esptool.py --chip esp32c6 -p /dev/cu.usbmodem1101 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 8MB 0x0 bootloader/bootloader.bin 0x10000 BTN-1_Zig.bin 0x8000 partition_table/partition-table.bin
+esptool.py v4.7.0
+Serial port /dev/cu.usbmodem1101
+Connecting...
+Chip is ESP32-C6FH4 (QFN32) (revision v0.2)
+Features: WiFi 6, BT 5, IEEE802.15.4
+Crystal is 40MHz
+MAC: 7c:2c:67:ff:fe:5d:9d:c0
+BASE MAC: 7c:2c:67:5d:9d:c0
+MAC_EXT: ff:fe
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00005fff...
+Flash will be erased from 0x00010000 to 0x000a0fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Compressed 21520 bytes to 12944...
+Writing at 0x00000000... (100 %)
+Traceback (most recent call last):
+  File "/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/lib/python3.12/site-packages/esptool/__init__.py", line 1139, in _main
+    main()
+  File "/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/lib/python3.12/site-packages/esptool/__init__.py", line 923, in main
+    operation_func(esp, args)
+  File "/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/lib/python3.12/site-packages/esptool/cmds.py", line 598, in write_flash
+    esp.flash_defl_block(block, seq, timeout=timeout)
+  File "/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/lib/python3.12/site-packages/esptool/loader.py", line 131, in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/lib/python3.12/site-packages/esptool/loader.py", line 1077, in flash_defl_block
+    self.check_command(
+  File "/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/lib/python3.12/site-packages/esptool/loader.py", line 467, in check_command
+    val, data = self.command(op, data, chk, timeout=timeout)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/lib/python3.12/site-packages/esptool/loader.py", line 436, in command
+    p = self.read()
+        ^^^^^^^^^^^
+  File "/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/lib/python3.12/site-packages/esptool/loader.py", line 369, in read
+    return next(self._slip_reader)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+StopIteration
+
+A fatal error occurred: The chip stopped responding.
+FAILED: [code=1] CMakeFiles/flash /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/CMakeFiles/flash 
+cd /Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py && /opt/homebrew/bin/cmake -D IDF_PATH=/Users/justinapollo/esp/v5.2.1/esp-idf -D "SERIAL_TOOL=/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/bin/python;;/Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py/esptool/esptool.py;--chip;esp32c6" -D "SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args" -D WORKING_DIRECTORY=/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build -P /Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py/run_serial_tool.cmake
+ninja: build stopped: subcommand failed.

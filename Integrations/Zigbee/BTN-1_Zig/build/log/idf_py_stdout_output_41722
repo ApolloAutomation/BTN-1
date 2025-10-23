@@ -1,0 +1,19 @@
+[1/5] cd /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/esp-idf/esptool_py && /Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/bin/python /Users/justinapollo/esp/v5.2.1/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 partition --type app /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/partition_table/partition-table.bin /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/BTN-1_Zig.bin
+BTN-1_Zig.bin binary size 0x90870 bytes. Smallest app partition is 0x1e0000 bytes. 0x14f790 bytes (70%) free.
+[2/5] Performing build step for 'bootloader'
+[1/1] cd /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/bootloader/esp-idf/esptool_py && /Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/bin/python /Users/justinapollo/esp/v5.2.1/esp-idf/components/partition_table/check_sizes.py --offset 0x8000 bootloader 0x0 /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/bootloader/bootloader.bin
+Bootloader binary size 0x5410 bytes. 0x2bf0 bytes (34%) free.
+[3/5] No install step for 'bootloader'
+[4/5] Completed 'bootloader'
+[4/5] cd /Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py && /opt/homebrew/bin/cmake -D IDF_PATH=/Users/justinapollo/esp/v5.2.1/esp-idf -D "SERIAL_TOOL=/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/bin/python;;/Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py/esptool/esptool.py;--chip;esp32c6" -D "SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args" -D WORKING_DIRECTORY=/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build -P /Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py/run_serial_tool.cmake
+esptool.py --chip esp32c6 -p /dev/cu.usbmodem1101 -b 460800 --before=default_reset --after=hard_reset write_flash --flash_mode dio --flash_freq 80m --flash_size 8MB 0x0 bootloader/bootloader.bin 0x10000 BTN-1_Zig.bin 0x8000 partition_table/partition-table.bin
+esptool.py v4.7.0
+Serial port /dev/cu.usbmodem1101
+Connecting.......
+
+A serial exception error occurred: Could not configure port: (6, 'Device not configured')
+Note: This error originates from pySerial. It is likely not a problem with esptool, but with the hardware connection or drivers.
+For troubleshooting steps visit: https://docs.espressif.com/projects/esptool/en/latest/troubleshooting.html
+FAILED: [code=1] CMakeFiles/flash /Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/CMakeFiles/flash 
+cd /Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py && /opt/homebrew/bin/cmake -D IDF_PATH=/Users/justinapollo/esp/v5.2.1/esp-idf -D "SERIAL_TOOL=/Users/justinapollo/.espressif/python_env/idf5.2_py3.12_env/bin/python;;/Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py/esptool/esptool.py;--chip;esp32c6" -D "SERIAL_TOOL_ARGS=--before=default_reset;--after=hard_reset;write_flash;@flash_args" -D WORKING_DIRECTORY=/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build -P /Users/justinapollo/esp/v5.2.1/esp-idf/components/esptool_py/run_serial_tool.cmake
+ninja: build stopped: subcommand failed.

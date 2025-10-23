@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/CMakeFiles/bootloader"
+		},
+		{
+			"file" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/CMakeFiles/bootloader.rule"
+		},
+		{
+			"file" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/CMakeFiles/bootloader-complete.rule"
+		},
+		{
+			"file" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+		},
+		{
+			"file" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+		},
+		{
+			"file" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+		},
+		{
+			"file" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+		},
+		{
+			"file" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+		},
+		{
+			"file" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+		},
+		{
+			"file" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/Zigbee/BTN-1_Zig/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"bootloader"
+		],
+		"name" : "bootloader"
+	}
+}

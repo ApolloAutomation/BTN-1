@@ -134,7 +134,7 @@ esp_err_t power_management_init(const power_config_t *config)
     if (g_pm_state.config.battery_monitoring_enabled) {
         /* Configure ADC for battery monitoring */
         adc1_config_width(ADC_WIDTH_BIT_12);
-        adc1_config_channel_atten(PM_BATTERY_ADC_CHANNEL, ADC_ATTEN_DB_11);
+        adc1_config_channel_atten(PM_BATTERY_ADC_CHANNEL, ADC_ATTEN_DB_12);
         
         /* For ESP32-C6, ADC calibration is handled internally */
         g_pm_state.adc_cali_handle = 0;
@@ -594,4 +594,42 @@ void power_enable_debug_logging(bool enable)
     } else {
         esp_log_level_set(TAG, ESP_LOG_INFO);
     }
+}
+
+/* Get battery information */
+esp_err_t power_get_battery_info(battery_info_t *info)
+{
+    if (!info) {
+        return ESP_ERR_INVALID_ARG;
+    }
+    
+    /* Initialize info structure */
+    info->percentage = g_pm_state.stats.battery_percentage;
+    info->voltage_mv = g_pm_state.stats.battery_voltage_mv;
+    info->is_usb_connected = false; /* For battery-powered device, assume no USB */
+    
+    /* If battery monitoring is enabled, read current values */
+    if (g_pm_state.config.battery_monitoring_enabled) {
+        /* Read ADC value */
+        int adc_reading = adc1_get_raw(PM_BATTERY_ADC_CHANNEL);
+        
+        /* Convert to voltage (ESP32-C6 has 12-bit ADC, 0-3.3V range with 12dB attenuation) */
+        uint32_t voltage = (adc_reading * 3300) / 4095;
+        
+        /* Account for voltage divider if present (adjust based on hardware) */
+        voltage *= 2;  /* Assuming 2:1 voltage divider */
+        
+        info->voltage_mv = voltage;
+        
+        /* Calculate percentage (3.0V = 0%, 4.2V = 100%) */
+        if (voltage >= 4200) {
+            info->percentage = 100;
+        } else if (voltage <= 3000) {
+            info->percentage = 0;
+        } else {
+            info->percentage = ((voltage - 3000) * 100) / (4200 - 3000);
+        }
+    }
+    
+    return ESP_OK;
 }

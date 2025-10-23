@@ -8,8 +8,8 @@
 #include "esp_zigbee_core.h"
 #include "nvs_flash.h"
 #include "nvs.h"
+#include "button_handler.h"  /* Must include before zigbee_device.h for button_event_t */
 #include "zigbee_device.h"
-#include "button_handler.h"
 #include "power_management.h"
 #include "ota_handler.h"
 #include "version.h"
@@ -427,21 +427,21 @@ static esp_zb_attribute_list_t *btn1_on_off_switch_config_cluster_create(void)
     
     /* Add switch type attribute (momentary switch) */
     uint8_t switch_type = ESP_ZB_ZCL_ON_OFF_SWITCH_CONFIGURATION_SWITCH_TYPE_MOMENTARY;
-    esp_zb_attribute_list_add_attr(switch_cfg_cluster,
-                                   ESP_ZB_ZCL_CLUSTER_ID_ON_OFF_SWITCH_CONFIG,
-                                   0x0000, /* Switch Type attribute ID */
-                                   ESP_ZB_ZCL_ATTR_TYPE_8BIT_ENUM,
-                                   ESP_ZB_ZCL_ATTR_ACCESS_READ_ONLY,
-                                   &switch_type);
+    esp_zb_cluster_add_attr(switch_cfg_cluster,
+                           ESP_ZB_ZCL_CLUSTER_ID_ON_OFF_SWITCH_CONFIG,
+                           0x0000, /* Switch Type attribute ID */
+                           ESP_ZB_ZCL_ATTR_TYPE_8BIT_ENUM,
+                           ESP_ZB_ZCL_ATTR_ACCESS_READ_ONLY,
+                           &switch_type);
     
     /* Add switch actions attribute (all actions allowed) */
     uint8_t switch_actions = 0; /* 0 means all actions are allowed */
-    esp_zb_attribute_list_add_attr(switch_cfg_cluster,
-                                   ESP_ZB_ZCL_CLUSTER_ID_ON_OFF_SWITCH_CONFIG,
-                                   0x0010, /* Switch Actions attribute ID */
-                                   ESP_ZB_ZCL_ATTR_TYPE_8BIT_ENUM,
-                                   ESP_ZB_ZCL_ATTR_ACCESS_READ_WRITE,
-                                   &switch_actions);
+    esp_zb_cluster_add_attr(switch_cfg_cluster,
+                           ESP_ZB_ZCL_CLUSTER_ID_ON_OFF_SWITCH_CONFIG,
+                           0x0010, /* Switch Actions attribute ID */
+                           ESP_ZB_ZCL_ATTR_TYPE_8BIT_ENUM,
+                           ESP_ZB_ZCL_ATTR_ACCESS_READ_WRITE,
+                           &switch_actions);
     
     return switch_cfg_cluster;
 }

@@ -143,7 +143,8 @@ static void esp_zb_task(void *pvParameters)
     
     /* Start Zigbee stack main loop */
     ESP_ERROR_CHECK(esp_zb_start(false));
-    esp_zb_main_loop_iteration();
+    /* The Zigbee stack task will handle the main loop internally */
+    vTaskDelete(NULL);
 }
 
 /* OTA progress callback */
@@ -166,11 +167,18 @@ static void ota_status_callback(ota_status_t status)
 
 void app_main(void)
 {
-    esp_zb_platform_config_t config = {
-        .radio_config = ESP_ZB_DEFAULT_RADIO_CONFIG(),
-        .host_config = ESP_ZB_DEFAULT_HOST_CONFIG(),
-    };
+    /* Initialize NVS first */
     ESP_ERROR_CHECK(nvs_flash_init());
+    
+    /* Configure Zigbee platform - no longer using deprecated macros */
+    esp_zb_platform_config_t config = {
+        .radio_config = {
+            .radio_mode = ZB_RADIO_MODE_NATIVE,
+        },
+        .host_config = {
+            .host_connection_mode = ZB_HOST_CONNECTION_MODE_NONE,
+        }
+    };
     
     /* Display firmware information */
     ESP_LOGI(TAG, "=== BTN-1 Zigbee Firmware ===");

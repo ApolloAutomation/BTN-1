@@ -1,0 +1,19 @@
+esptool.py v4.7.0
+Serial port /dev/cu.usbmodem1101
+Connecting........
+Chip is ESP32-C6FH4 (QFN32) (revision v0.2)
+Features: WiFi 6, BT 5, IEEE802.15.4
+Crystal is 40MHz
+MAC: 7c:2c:67:ff:fe:5d:9d:c0
+BASE MAC: 7c:2c:67:5d:9d:c0
+MAC_EXT: ff:fe
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Erasing flash (this may take a while)...
+
+A serial exception error occurred: device reports readiness to read but returned no data (device disconnected or multiple access on port?)
+Note: This error originates from pySerial. It is likely not a problem with esptool, but with the hardware connection or drivers.
+For troubleshooting steps visit: https://docs.espressif.com/projects/esptool/en/latest/troubleshooting.html
