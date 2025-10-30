@@ -1,17 +1,84 @@
 substitutions:
   name: apollo-btn-1
-  version: "25.10.17.1"
+  version: "25.10.30.1"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
-esp32:
-  board: esp32-c6-devkitm-1
-  variant: esp32c6
-  flash_size: 8MB
-  framework:
-    type: esp-idf
+
+esphome:
+  name: apollo-btn-1
+  friendly_name: Apollo BTN-1
+  comment: Apollo BTN-1
+  name_add_mac_suffix: true
+  platformio_options:
+    board_build.flash_mode: dio
+
+  project:
+    name: "ApolloAutomation.BTN-1"
+    version: "${version}"
+
+  min_version: 2023.11.1
+
+  # Wake-up detection logic
+  on_boot:
+    - priority: 500
+      then:
+        - lambda: |-
+            id(deep_sleep_1).set_sleep_duration(id(deep_sleep_sleep_duration).state * 60 * 60 * 1000);
+        - if:
+            condition:
+              or:
+                - binary_sensor.is_on: ota_mode
+                - switch.is_on: prevent_sleep
+            then:
+              - lambda: |-
+                  ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA On Boot");
+                  id(deep_sleep_1).prevent_deep_sleep();
+    
+    - priority: -900
+      then:
+      - lambda: |-
+          uint64_t wake = esp_sleep_get_ext1_wakeup_status();
+          
+          // Only process deep sleep wake if we actually woke from deep sleep
+          if (wake != 0) {
+            uint32_t low = wake % 0xFFFFFFFF;
+            uint32_t high = (wake >> 32) % 0xFFFFFFFF;
+            
+            ESP_LOGI("Apollo", "Deep sleep wake detected, wake status: 0x%llx", wake);
+            
+            // Check which button caused the wake-up
+            if ((low) & (1<<(2))) {
+              id(wakeup_button_pressed).publish_state("1");
+            }
+            else if ((low) & (1<<(4))) {
+              id(wakeup_button_pressed).publish_state("2");
+            }
+            else if ((low) & (1<<(6))) {
+              id(wakeup_button_pressed).publish_state("3");
+            }
+            else if ((low) & (1<<(5))) {
+              id(wakeup_button_pressed).publish_state("4");
+            }
+            else {
+              id(wakeup_button_pressed).publish_state("0");
+            }
+          }
+          else {
+            // If no deep sleep wake and no button was detected in powered-off scenario
+            // then set to "0" (no button press)
+            if (id(wakeup_button_pressed).state == "") {
+              ESP_LOGI("Apollo", "No wake source detected, setting to 0");
+              id(wakeup_button_pressed).publish_state("0");
+            }
+          }
+          
+  on_shutdown:
+    - light.turn_off: rgb_light
+    - switch.turn_off: accessory_power
+    - switch.turn_off: power_latch
 
 api:
-  id: api_server
+  reboot_timeout: 0s
   services:
     - service: play_buzzer
       variables:
@@ -19,6 +86,63 @@ api:
       then:
         - rtttl.play:
             rtttl: !lambda 'return song_str;'
+  on_client_connected:
+    then:
+      - delay: 5s
+      # Trigger the button that woke up the device
+      - lambda: |-
+          // Get which button woke up the device
+          std::string wake_button = id(wakeup_button_pressed).state;
+          
+          if (wake_button != "0" && wake_button != "") {
+            ESP_LOGI("Apollo", "Client connected - triggering wake button %s", wake_button.c_str());
+            
+            // Trigger the corresponding binary sensor
+            if (wake_button == "1") {
+              id(button_1_event).trigger("click");
+            } else if (wake_button == "2") {
+              id(button_2_event).trigger("click");
+            } else if (wake_button == "3") {
+              id(button_3_event).trigger("click");
+            } else if (wake_button == "4") {
+              id(button_4_event).trigger("click");
+            }
+            id(wakeup_button_pressed).publish_state("0");
+          }
+
+      # Send Wake up Button State
+      - component.update: wakeup_button_pressed
+
+      # Check OTA Switch
+      - delay: 3s
+      - if:
+          condition:
+            or:
+              - binary_sensor.is_on: ota_mode
+              - switch.is_on: prevent_sleep
+          then:
+            - lambda: |- 
+                ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA Or Switch");
+                id(deep_sleep_1).prevent_deep_sleep(); 
+          else: 
+            - lambda: |-
+                id(reportAllValues).execute();
+            - delay: 2s
+            - deep_sleep.enter:
+                id: deep_sleep_1
+
+external_components:
+  - source: github://ApolloAutomation/ExternalComponents
+    components: [deep_sleep]
+  - source: github://ApolloAutomation/esphome-battery-component
+    components: [max17048] #Forked OptionZero
+
+esp32:
+  board: esp32-c6-devkitm-1
+  variant: esp32c6
+  flash_size: 8MB
+  framework:
+    type: esp-idf
 
 globals:
   - id: cycleCounter
