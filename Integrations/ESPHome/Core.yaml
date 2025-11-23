@@ -132,8 +132,6 @@ api:
                 id: deep_sleep_1
 
 external_components:
-  - source: github://ApolloAutomation/ExternalComponents
-    components: [deep_sleep]
   - source: github://ApolloAutomation/esphome-battery-component
     components: [max17048] #Forked OptionZero
 
