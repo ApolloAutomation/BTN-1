@@ -314,7 +314,7 @@ binary_sensor:
               delay(3000);
               id(testCycleCount) = 0;
               id(runTest) = true;
-              id(testScript).execute();
+              // id(testScript).execute();1
             }
   - platform: gpio
     id: button_1
