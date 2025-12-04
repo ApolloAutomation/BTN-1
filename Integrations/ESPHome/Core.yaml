@@ -297,8 +297,8 @@ binary_sensor:
         - lambda: |-
             if (millis() - id(button_press_timestamp) >= 10000) {
               // Remove Wifi
-              // id(testCycleCount) = 0;
-              // id(runTest) = true;
+              id(testCycleCount) = 0;
+              id(runTest) = true;
               id(prevent_sleep).turn_on();
               id(factory_reset_switch).turn_on();
             }
