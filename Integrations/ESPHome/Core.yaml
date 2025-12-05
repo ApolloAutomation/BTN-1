@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "25.11.6.1"
+  version: "25.12.5.1"
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 
@@ -71,6 +71,13 @@ esphome:
               id(wakeup_button_pressed).publish_state("0");
             }
           }
+    - priority: -10
+      then:
+        - if:
+            condition:
+              - lambda: "return id(runTest);"
+            then:
+              - lambda: "id(testScript).execute();"
           
   on_shutdown:
     - light.turn_off: rgb_light
@@ -132,8 +139,6 @@ api:
                 id: deep_sleep_1
 
 external_components:
-  - source: github://ApolloAutomation/ExternalComponents
-    components: [deep_sleep]
   - source: github://ApolloAutomation/esphome-battery-component
     components: [max17048] #Forked OptionZero
 
@@ -153,6 +158,14 @@ globals:
     restore_value: no
     type: uint32_t
     initial_value: '0'
+  - id: runTest
+    restore_value: yes
+    type: bool
+    initial_value: "true"
+  - id: testCycleCount
+    type: int
+    restore_value: no
+    initial_value: "0"
 
 captive_portal:
   id: captive_portal_instance
@@ -267,7 +280,7 @@ binary_sensor:
     name: Online
     id: ink_ha_connected
   - platform: gpio
-    pin: 
+    pin:
       number: GPIO9
       inverted: true
       mode:
@@ -275,34 +288,41 @@ binary_sensor:
         pullup: true
       ignore_strapping_warning: true
     id: reset_button
-    on_press:
-      then:
-        - lambda: |-
-            id(button_press_timestamp) = millis();    
-    on_release:
-      then:
-        - lambda: |-
-            if (millis() - id(button_press_timestamp) >= 10000) {
-              // Remove Wifi
-              // id(testCycleCount) = 0;
-              // id(runTest) = true;
-              id(prevent_sleep).turn_on();
-              id(factory_reset_switch).turn_on();
-            }
-            else if (millis() - id(button_press_timestamp) >= 3000) {
-              //Turn Prevent Sleep On
-              id(prevent_sleep).turn_on();
-              //Prevent Sleep
+    on_multi_click:
+      - timing:
+          - ON for at least 10s
+        then:
+          # Factory reset (10s hold)
+          - globals.set:
+              id: testCycleCount
+              value: "0"
+          - globals.set:
+              id: runTest
+              value: "true"
+          - switch.turn_on: prevent_sleep
+          - switch.turn_on: factory_reset_switch
+      - timing:
+          - ON for at least 3s
+          - OFF for at least 0.2s
+        then:
+          # Prevent sleep (3s hold)
+          - switch.turn_on: prevent_sleep
+          - lambda: |-
               id(deep_sleep_1).prevent_deep_sleep();
-            }
-            else {
-              // StatusCheck
-              id(statusCheck).execute();
-              delay(3000);
-              // id(testCycleCount) = 0;
-              // id(runTest) = true;
-              // id(testScript).execute();
-            }
+      - timing:
+          - ON for at most 1s
+          - OFF for at least 0.2s
+        then:
+          # Short press - run status check then test script
+          - script.execute: statusCheck
+          - delay: 3s
+          - globals.set:
+              id: testCycleCount
+              value: "0"
+          - globals.set:
+              id: runTest
+              value: "true"
+          - script.execute: testScript
   - platform: gpio
     id: button_1
     name: "Button 1"
@@ -686,3 +706,20 @@ script:
       - component.update: sys_esp_temperature
       - component.update: sys_uptime
       - component.update: wakeup_button_pressed
+  
+  - id: testScript
+    then:
+      if:
+        condition:
+          - lambda: "return id(runTest) == true;"
+        then:
+          - lambda: "id(runTest) = false;"
+          - lambda: "id(testCycleCount) = 0;"
+          - light.turn_on:
+              id: rgb_light
+              red: 0%
+              green: 100%
+              blue: 0%
+          - delay: 5s
+          - light.turn_off:
+              id: rgb_light
