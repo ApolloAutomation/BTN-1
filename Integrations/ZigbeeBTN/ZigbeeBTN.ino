@@ -9,35 +9,53 @@
 #define BUTTON_PIN            9  // ESP32-C6/H2 Boot button
 #define ZIGBEE_LIGHT_ENDPOINT 10
 
+// WS2812 LED color when ON (white at moderate brightness)
+#define LED_BRIGHTNESS        64
+#define LED_R                 LED_BRIGHTNESS
+#define LED_G                 LED_BRIGHTNESS
+#define LED_B                 LED_BRIGHTNESS
+
 ZigbeeLight zbLight = ZigbeeLight(ZIGBEE_LIGHT_ENDPOINT);
 
 /********************* RGB LED functions **************************/
 void setLED(bool value) {
-  digitalWrite(LED_PIN, value);
+  Serial.printf("setLED callback called with value: %s\n", value ? "ON" : "OFF");
+  if (value) {
+    neopixelWrite(LED_PIN, LED_R, LED_G, LED_B);
+  } else {
+    neopixelWrite(LED_PIN, 0, 0, 0);
+  }
 }
 
 /********************* Arduino functions **************************/
 void setup() {
-  // Init LED and turn it OFF (if LED_PIN == RGB_BUILTIN, the rgbLedWrite() will be used under the hood)
-  pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
+  Serial.begin(9600);
+  delay(100);
+  Serial.println("\n\n=== ZigbeeBTN Starting ===");
+
+  // Init WS2812 LED and turn it OFF
+  Serial.println("Initializing WS2812 LED...");
+  neopixelWrite(LED_PIN, 0, 0, 0);
 
   // Init button for factory reset
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
-  //Optional: set Zigbee device name and model
-  zbLight.setManufacturerAndModel("Espressif", "ZBLightBulb");
+  // Set Zigbee device name and model
+  zbLight.setManufacturerAndModel("Apollo", "BTN-1");
+  Serial.println("Zigbee manufacturer/model set");
 
   // Set callback function for light change
   zbLight.onLightChange(setLED);
+  Serial.println("Light change callback registered");
 
-  //Add endpoint to Zigbee Core
-  log_d("Adding ZigbeeLight endpoint to Zigbee Core");
+  // Add endpoint to Zigbee Core
+  Serial.println("Adding ZigbeeLight endpoint to Zigbee Core...");
   Zigbee.addEndpoint(&zbLight);
 
   // When all EPs are registered, start Zigbee. By default acts as ZIGBEE_END_DEVICE
-  log_d("Calling Zigbee.begin()");
+  Serial.println("Starting Zigbee...");
   Zigbee.begin();
+  Serial.println("Zigbee.begin() called - waiting for network join");
 }
 
 void loop() {
