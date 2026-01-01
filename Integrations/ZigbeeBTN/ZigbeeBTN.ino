@@ -4,15 +4,10 @@
 
 #include "ZigbeeCore.h"
 #include "ep/ZigbeeLight.h"
-#include "ep/ZigbeeSwitch.h"
-#include <Preferences.h>
-
-Preferences prefs;
 
 #define LED_PIN               21
 #define BUTTON_PIN            9  // ESP32-C6/H2 Boot button
 #define ZIGBEE_LIGHT_ENDPOINT 10
-#define ZIGBEE_SWITCH_ENDPOINT 5
 #define ACCESSORY_POWER_PIN   18
 
 // WS2812 LED color when ON (white at moderate brightness)
@@ -53,7 +48,6 @@ static SwitchData buttonFunctionPair[] = {{BUTTON_PIN, SWITCH_ONOFF_TOGGLE_CONTR
 
 // Zigbee endpoints
 ZigbeeLight zbLight = ZigbeeLight(ZIGBEE_LIGHT_ENDPOINT);
-ZigbeeSwitch zbSwitch = ZigbeeSwitch(ZIGBEE_SWITCH_ENDPOINT);
 
 /********************* RGB LED functions **************************/
 void setLED(bool value) {
@@ -70,8 +64,11 @@ static QueueHandle_t gpio_evt_queue = NULL;
 
 static void onZbButton(SwitchData *button_func_pair) {
   if (button_func_pair->func == SWITCH_ONOFF_TOGGLE_CONTROL) {
-    Serial.println("Button pressed - sending toggle command to bound lights");
-    zbSwitch.lightToggle();
+    // Toggle the light endpoint state - HA will see this state change
+    bool currentState = zbLight.getLightState();
+    bool newState = !currentState;
+    Serial.printf("Button pressed - toggling light state to %s\n", newState ? "ON" : "OFF");
+    zbLight.setLightState(newState);
   }
 }
 
@@ -115,16 +112,7 @@ void setup() {
   Serial.println("Adding ZigbeeLight endpoint to Zigbee Core...");
   Zigbee.addEndpoint(&zbLight);
 
-  // Configure switch endpoint
-  zbSwitch.setManufacturerAndModel("Apollo", "BTN-1-Switch");
-  zbSwitch.allowMultipleBinding(true);
-  Serial.println("Zigbee Switch manufacturer/model set");
-
-  // Add switch endpoint to Zigbee Core
-  Serial.println("Adding ZigbeeSwitch endpoint to Zigbee Core...");
-  Zigbee.addEndpoint(&zbSwitch);
-
-  // Init button for switch function
+  // Init button for toggling light state
   for (int i = 0; i < PAIR_SIZE(buttonFunctionPair); i++) {
     pinMode(buttonFunctionPair[i].pin, INPUT_PULLUP);
     // Create a queue to handle gpio events from ISR
@@ -142,22 +130,18 @@ void setup() {
   Zigbee.begin();
   Serial.println("Zigbee.begin() called");
 
-  // TEMPORARY: One-time factory reset to clear old network credentials
-  // Remove this entire block after device is successfully paired!
-  prefs.begin("zbtn", false);
-  bool needsReset = prefs.getBool("reset3", true);  // Changed key to force new reset
-  if (needsReset) {
-    prefs.putBool("reset3", false);  // Mark as done
-    prefs.end();
-    Serial.println("Forcing one-time Zigbee factory reset...");
-    neopixelWrite(LED_PIN, 255, 0, 0);  // Red = resetting
-    delay(500);
-    Zigbee.factoryReset();
-    // Device will reboot, won't reach here
-  }
-  prefs.end();
   Serial.println("Waiting for network join...");
   neopixelWrite(LED_PIN, 0, 0, 255);  // Blue = waiting for pairing
+
+  // Wait for Zigbee to connect (with timeout visual feedback)
+  while (!Zigbee.connected()) {
+    delay(100);
+  }
+
+  Serial.println("Zigbee connected!");
+  neopixelWrite(LED_PIN, 0, 255, 0);  // Green = connected
+  delay(1000);
+  neopixelWrite(LED_PIN, 0, 0, 0);   // Turn off LED
 }
 
 void loop() {

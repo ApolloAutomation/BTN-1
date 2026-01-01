@@ -36,3 +36,6 @@ Integrations/.DS_Store
 
 /.esphome/
 /secrets.yaml
+Integrations/Zigbee/BTN-1_IDF/.vscode
+Integrations/Zigbee/BTN-1_IDF/build
+Integrations/Zigbee/BTN-1_IDF/managed_components
