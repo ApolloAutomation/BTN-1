@@ -1,0 +1,12 @@
+# ESP32-C6 Zigbee Partition Table for BTN-1
+# Name,   Type, SubType, Offset,  Size,   Flags
+# IMPORTANT: zb_storage and zb_fct MUST use subtype 'fat' (0x81)
+# The ESP Zigbee NVRAM code searches by name AND subtype
+nvs,      data, nvs,     0x9000,  0x5000,
+otadata,  data, ota,     0xe000,  0x2000,
+app0,     app,  ota_0,   0x10000, 0x1C0000,
+app1,     app,  ota_1,   0x1D0000,0x1C0000,
+spiffs,   data, spiffs,  0x390000,0x30000,
+zb_storage,data,fat,     0x3C0000,0x10000,
+zb_fct,   data, fat,     0x3D0000,0x1000,
+coredump, data, coredump,0x3E0000,0x10000,

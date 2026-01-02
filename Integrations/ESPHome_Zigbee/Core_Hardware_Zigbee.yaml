@@ -1,0 +1,432 @@
+# Apollo Automation BTN-1 Hardware Configuration for Zigbee
+# This file contains all hardware definitions compatible with Zigbee
+#
+# Key differences from WiFi version:
+# - No WiFi, API, captive_portal, or web_server
+# - Button binary_sensors are NOT internal (for Zigbee discovery)
+# - Event entities removed (not supported by Zigbee auto-discovery)
+# - Power switches are internal
+# - internal_temperature and uptime sensors removed
+#
+# NOTE: When including this as a package, you MUST also include
+# the MAX17048 external component in your main config:
+#   external_components:
+#     - source: github://ApolloAutomation/esphome-battery-component
+#       components: [max17048]
+
+substitutions:
+  name: apollo-btn-1-zb
+  version: "25.10.10.2-zigbee"
+  device_description: ${name} Zigbee - Apollo Automation BTN-1 Zigbee version ${version}
+
+# ============================================
+# Globals
+# ============================================
+globals:
+  - id: cycleCounter
+    type: int
+    restore_value: no
+    initial_value: '0'
+  - id: button_press_timestamp
+    restore_value: no
+    type: uint32_t
+    initial_value: '0'
+
+# ============================================
+# I2C Bus Configuration
+# ============================================
+i2c:
+  id: i2c_bus
+  sda: GPIO1
+  scl: GPIO0
+
+# ============================================
+# Buzzer Output (LEDC)
+# ============================================
+output:
+  - platform: ledc
+    pin: GPIO23
+    id: buzzer
+
+rtttl:
+  id: rtttl_buzzer
+  output: buzzer
+
+# ============================================
+# Deep Sleep Configuration
+# ============================================
+deep_sleep:
+  id: deep_sleep_1
+  sleep_duration: 24h
+  run_duration: 90s
+  esp32_ext1_wakeup:
+    mode: ANY_HIGH
+    pins:
+      - number: GPIO2
+        allow_other_uses: true
+      - number: GPIO4
+        allow_other_uses: true
+      - number: GPIO5
+        allow_other_uses: true
+      - number: GPIO6
+        allow_other_uses: true
+
+# ============================================
+# Sleep Duration Configuration
+# ============================================
+number:
+  - platform: template
+    name: "Sleep Duration"
+    id: deep_sleep_sleep_duration
+    min_value: 0
+    max_value: 800
+    step: 1
+    mode: box
+    update_interval: never
+    optimistic: true
+    restore_value: true
+    initial_value: 24
+    icon: "mdi:arrow-collapse-right"
+    entity_category: CONFIG
+    unit_of_measurement: "h"
+    on_value:
+      then:
+        - lambda: |-
+            id(deep_sleep_1).set_sleep_duration(x * 60 * 60 * 1000);
+
+# ============================================
+# Button Binary Sensors
+# Note: NOT internal - exposed for Zigbee discovery
+# ============================================
+binary_sensor:
+  # Reset Button (GPIO9)
+  # Hold 3-5s: Prevent sleep
+  # Hold 5-10s: Reset Zigbee (enter pairing mode)
+  # Hold 10s+: Factory reset
+  - platform: gpio
+    pin:
+      number: GPIO9
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+      ignore_strapping_warning: true
+    id: reset_button
+    name: "Reset Button"
+    internal: true
+    on_press:
+      then:
+        - logger.log:
+            level: INFO
+            format: "Reset button pressed - hold 5-10s to reset Zigbee"
+        - lambda: |-
+            id(button_press_timestamp) = millis();
+    on_release:
+      then:
+        - lambda: |-
+            uint32_t hold_time = millis() - id(button_press_timestamp);
+            ESP_LOGI("button", "Reset button released after %d ms", hold_time);
+            
+            if (hold_time >= 10000) {
+              // 10+ seconds: Factory reset
+              ESP_LOGI("button", "Factory reset triggered!");
+              id(prevent_sleep).turn_on();
+              id(factory_reset_switch).turn_on();
+            }
+            else if (hold_time >= 3000) {
+              // 3-5 seconds: Prevent sleep
+              ESP_LOGI("button", "Prevent sleep activated");
+              id(prevent_sleep).turn_on();
+              id(deep_sleep_1).prevent_deep_sleep();
+            }
+    # CRITICAL: 5-10 second hold triggers Zigbee reset (pairing mode)
+    on_click:
+      min_length: 5s
+      max_length: 10s
+      then:
+        - logger.log:
+            level: INFO
+            format: "*** ZIGBEE RESET - Entering pairing mode ***"
+        - zigbee.reset: zb
+
+  # Button 1 (GPIO2) - Exposed for Zigbee
+  # CRITICAL: on_press/on_release with zigbee.report required for ZHA to receive button states
+  - platform: gpio
+    id: button_1
+    name: "Button 1"
+    pin:
+      number: GPIO2
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    on_press:
+      then:
+        - logger.log:
+            level: INFO
+            format: "Button 1 PRESSED - sending Zigbee report"
+        - zigbee.report: zb
+    on_release:
+      then:
+        - logger.log:
+            level: INFO
+            format: "Button 1 RELEASED - sending Zigbee report"
+        - zigbee.report: zb
+
+  # Button 2 (GPIO4) - Exposed for Zigbee
+  - platform: gpio
+    id: button_2
+    name: "Button 2"
+    pin:
+      number: GPIO4
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    on_press:
+      then:
+        - logger.log:
+            level: INFO
+            format: "Button 2 PRESSED - sending Zigbee report"
+        - zigbee.report: zb
+    on_release:
+      then:
+        - logger.log:
+            level: INFO
+            format: "Button 2 RELEASED - sending Zigbee report"
+        - zigbee.report: zb
+
+  # Button 3 (GPIO6) - Exposed for Zigbee
+  - platform: gpio
+    id: button_3
+    name: "Button 3"
+    pin:
+      number: GPIO6
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    on_press:
+      then:
+        - logger.log:
+            level: INFO
+            format: "Button 3 PRESSED - sending Zigbee report"
+        - zigbee.report: zb
+    on_release:
+      then:
+        - logger.log:
+            level: INFO
+            format: "Button 3 RELEASED - sending Zigbee report"
+        - zigbee.report: zb
+
+  # Button 4 (GPIO5) - Exposed for Zigbee
+  - platform: gpio
+    id: button_4
+    name: "Button 4"
+    pin:
+      number: GPIO5
+      allow_other_uses: true
+      mode:
+        input: true
+        pulldown: true
+    on_press:
+      then:
+        - logger.log:
+            level: INFO
+            format: "Button 4 PRESSED - sending Zigbee report"
+        - zigbee.report: zb
+    on_release:
+      then:
+        - logger.log:
+            level: INFO
+            format: "Button 4 RELEASED - sending Zigbee report"
+        - zigbee.report: zb
+
+# ============================================
+# Battery Monitoring (MAX17048)
+# ============================================
+sensor:
+  - platform: max17048
+    id: max_17048
+    battery_voltage:
+      name: "Battery Voltage"
+      id: batt_v
+    battery_level:
+      name: "Battery Level"
+      id: batt_pct
+      filters:
+        - lambda: |
+            if (x > 100) return 100;
+            else return (x);
+
+# ============================================
+# Switches
+# ============================================
+switch:
+  # Prevent Sleep (User-accessible)
+  - platform: template
+    name: "Prevent Sleep"
+    id: prevent_sleep
+    icon: mdi:sleep
+    restore_mode: RESTORE_DEFAULT_ON
+    optimistic: true
+    entity_category: "config"
+    on_turn_on:
+      then:
+        - lambda: |-
+            id(deep_sleep_1).prevent_deep_sleep();
+    on_turn_off:
+      then:
+        - lambda: |-
+            id(deep_sleep_1).allow_deep_sleep();
+
+  # Factory Reset (Internal)
+  - platform: factory_reset
+    id: factory_reset_switch
+    disabled_by_default: true
+
+  # Power Latch (Internal - hardware control)
+  - platform: gpio
+    pin: GPIO19
+    name: "Power Latch"
+    id: power_latch
+    restore_mode: ALWAYS_ON
+    setup_priority: 2000
+    internal: true
+
+  # Accessory Power (Internal - hardware control)
+  - platform: gpio
+    pin: GPIO18
+    name: "Accessory Power"
+    id: accessory_power
+    restore_mode: ALWAYS_ON
+    setup_priority: 2000
+    internal: true
+
+# ============================================
+# RGB LEDs (WS2812 on GPIO21)
+# ============================================
+light:
+  # Main RGB Strip (internal, used by partitions)
+  - platform: esp32_rmt_led_strip
+    id: rgb_light
+    name: "RGB Light"
+    pin: GPIO21
+    default_transition_length: 0s
+    chipset: WS2812
+    num_leds: 4
+    rgb_order: grb
+    internal: true
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
+
+  # BTN 1 Light (LED 0)
+  - platform: partition
+    name: "BTN 1 Light"
+    id: btn_1_light
+    default_transition_length: 0s
+    segments:
+      - id: rgb_light
+        from: 0
+        to: 0
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
+
+  # BTN 2 Light (LED 1)
+  - platform: partition
+    name: "BTN 2 Light"
+    id: btn_2_light
+    default_transition_length: 0s
+    segments:
+      - id: rgb_light
+        from: 1
+        to: 1
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
+
+  # BTN 3 Light (LED 2)
+  - platform: partition
+    name: "BTN 3 Light"
+    id: btn_3_light
+    default_transition_length: 0s
+    segments:
+      - id: rgb_light
+        from: 2
+        to: 2
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
+
+  # BTN 4 Light (LED 3)
+  - platform: partition
+    name: "BTN 4 Light"
+    id: btn_4_light
+    default_transition_length: 0s
+    segments:
+      - id: rgb_light
+        from: 3
+        to: 3
+    effects:
+      - pulse:
+          name: "Slow Pulse"
+          transition_length: 1000ms
+          update_interval: 1000ms
+          min_brightness: 0%
+          max_brightness: 100%
+      - pulse:
+          name: "Fast Blink"
+          transition_length: 100ms
+          update_interval: 100ms
+          min_brightness: 50%
+          max_brightness: 100%
+
+# ============================================
+# Restart Button
+# ============================================
+button:
+  - platform: restart
+    icon: mdi:power-cycle
+    name: "ESP Reboot"
