@@ -47,13 +47,12 @@ static const char *BUTTON_MODEL_IDS[NUM_BUTTONS] = {
     "\x0e""BTN-1 Button 4",
 };
 
-/* Zigbee Config */
-#define ESP_ZB_ZED_CONFIG() {                                   \
-    .esp_zb_role = ESP_ZB_DEVICE_TYPE_ED,                       \
+/* Zigbee Config - Router for always-on responsiveness */
+#define ESP_ZB_ZR_CONFIG() {                                    \
+    .esp_zb_role = ESP_ZB_DEVICE_TYPE_ROUTER,                   \
     .install_code_policy = false,                               \
-    .nwk_cfg.zed_cfg = {                                        \
-        .ed_timeout = ESP_ZB_ED_AGING_TIMEOUT_64MIN,            \
-        .keep_alive = 3000,                                     \
+    .nwk_cfg.zczr_cfg = {                                       \
+        .max_children = 10,                                     \
     },                                                          \
 }
 
@@ -354,7 +353,7 @@ void esp_zb_app_signal_handler(esp_zb_app_signal_t *signal)
 
 static void zigbee_task(void *arg)
 {
-    esp_zb_cfg_t cfg = ESP_ZB_ZED_CONFIG();
+    esp_zb_cfg_t cfg = ESP_ZB_ZR_CONFIG();
     esp_zb_init(&cfg);
 
     create_endpoints();
