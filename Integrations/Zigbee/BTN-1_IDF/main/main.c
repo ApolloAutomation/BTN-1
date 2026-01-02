@@ -39,6 +39,14 @@ static const char *TAG = "BTN1_ZB";
 #define MANUFACTURER_NAME     "\x06""Apollo"
 #define MODEL_ID              "\x05""BTN-1"
 
+/* Model IDs for each button (Zigbee string format: length byte + string) */
+static const char *BUTTON_MODEL_IDS[NUM_BUTTONS] = {
+    "\x0e""BTN-1 Button 1",
+    "\x0e""BTN-1 Button 2",
+    "\x0e""BTN-1 Button 3",
+    "\x0e""BTN-1 Button 4",
+};
+
 /* Zigbee Config */
 #define ESP_ZB_ZED_CONFIG() {                                   \
     .esp_zb_role = ESP_ZB_DEVICE_TYPE_ED,                       \
@@ -220,7 +228,7 @@ static void button_task(void *arg)
 
 /********************* Zigbee Functions *********************/
 
-static esp_zb_cluster_list_t *create_cluster_list(void)
+static esp_zb_cluster_list_t *create_cluster_list(int button_idx)
 {
     esp_zb_cluster_list_t *list = esp_zb_zcl_cluster_list_create();
 
@@ -231,7 +239,7 @@ static esp_zb_cluster_list_t *create_cluster_list(void)
     };
     esp_zb_attribute_list_t *basic = esp_zb_basic_cluster_create(&basic_cfg);
     esp_zb_basic_cluster_add_attr(basic, ESP_ZB_ZCL_ATTR_BASIC_MANUFACTURER_NAME_ID, (void *)MANUFACTURER_NAME);
-    esp_zb_basic_cluster_add_attr(basic, ESP_ZB_ZCL_ATTR_BASIC_MODEL_IDENTIFIER_ID, (void *)MODEL_ID);
+    esp_zb_basic_cluster_add_attr(basic, ESP_ZB_ZCL_ATTR_BASIC_MODEL_IDENTIFIER_ID, (void *)BUTTON_MODEL_IDS[button_idx]);
     esp_zb_cluster_list_add_basic_cluster(list, basic, ESP_ZB_ZCL_CLUSTER_SERVER_ROLE);
 
     // Identify cluster
@@ -252,7 +260,7 @@ static void create_endpoints(void)
     esp_zb_ep_list_t *ep_list = esp_zb_ep_list_create();
 
     for (int i = 0; i < NUM_BUTTONS; i++) {
-        esp_zb_cluster_list_t *clusters = create_cluster_list();
+        esp_zb_cluster_list_t *clusters = create_cluster_list(i);
         esp_zb_endpoint_config_t cfg = {
             .endpoint = buttons[i].endpoint,
             .app_profile_id = ESP_ZB_AF_HA_PROFILE_ID,
@@ -277,12 +285,7 @@ static esp_err_t zb_attribute_handler(const esp_zb_zcl_set_attr_value_message_t 
         for (int i = 0; i < NUM_BUTTONS; i++) {
             if (buttons[i].endpoint == msg->info.dst_endpoint) {
                 buttons[i].state = state;
-                // Turn all LEDs on/off together
-                if (state) {
-                    led_set_all(64, 64, 64);
-                } else {
-                    led_clear_all();
-                }
+                led_update_button(i);
                 ESP_LOGI(TAG, "Button %d set to %s via Zigbee", i + 1, state ? "ON" : "OFF");
                 break;
             }
