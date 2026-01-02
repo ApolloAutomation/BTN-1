@@ -314,9 +314,17 @@ void esp_zb_app_signal_handler(esp_zb_app_signal_t *signal)
         case ESP_ZB_BDB_SIGNAL_DEVICE_FIRST_START:
         case ESP_ZB_BDB_SIGNAL_DEVICE_REBOOT:
             if (err == ESP_OK) {
-                ESP_LOGI(TAG, "Searching for network...");
-                led_set_all(0, 0, 64);  // Blue
-                esp_zb_bdb_start_top_level_commissioning(ESP_ZB_BDB_MODE_NETWORK_STEERING);
+                if (esp_zb_bdb_is_factory_new()) {
+                    ESP_LOGI(TAG, "Factory new, searching for network...");
+                    led_set_all(0, 0, 64);  // Blue
+                    esp_zb_bdb_start_top_level_commissioning(ESP_ZB_BDB_MODE_NETWORK_STEERING);
+                } else {
+                    ESP_LOGI(TAG, "Rejoined network!");
+                    zigbee_connected = true;
+                    led_set_all(0, 64, 0);  // Green
+                    vTaskDelay(pdMS_TO_TICKS(500));
+                    led_clear_all();
+                }
             } else {
                 ESP_LOGW(TAG, "Init failed: %s", esp_err_to_name(err));
             }
