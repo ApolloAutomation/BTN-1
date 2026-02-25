@@ -79,8 +79,8 @@ esphome:
 
 api:
   reboot_timeout: 0s
-  services:
-    - service: play_buzzer
+  actions:
+    - action: play_buzzer
       variables:
         song_str: string
       then:
