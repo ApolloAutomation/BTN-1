@@ -713,7 +713,7 @@ script:
 
   - id: testScript
     then:
-      if:
+      - if:
         condition:
           - lambda: "return id(runTest) == true;"
         then:
