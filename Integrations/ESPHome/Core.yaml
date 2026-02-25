@@ -131,12 +131,11 @@ api:
             - lambda: |- 
                 ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA Or Switch");
                 id(deep_sleep_1).prevent_deep_sleep(); 
-          else: 
+          else:
             - lambda: |-
                 id(reportAllValues).execute();
             - delay: 2s
-            - deep_sleep.enter:
-                id: deep_sleep_1
+            - script.execute: go_to_sleep
 
 external_components:
   - source: github://ApolloAutomation/esphome-battery-component
@@ -706,7 +705,12 @@ script:
       - component.update: sys_esp_temperature
       - component.update: sys_uptime
       - component.update: wakeup_button_pressed
-  
+
+  - id: go_to_sleep
+    then:
+      - deep_sleep.enter:
+          id: deep_sleep_1
+
   - id: testScript
     then:
       if:
