@@ -218,6 +218,10 @@ text_sensor:
     id: wakeup_button_pressed
     name: "Wake-up Button Pressed"
     icon: "mdi:gesture-tap-button"
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      id: wifi_ip
 
 event:
   - platform: template
