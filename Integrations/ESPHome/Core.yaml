@@ -79,8 +79,8 @@ esphome:
 
 api:
   reboot_timeout: 0s
-  services:
-    - service: play_buzzer
+  actions:
+    - action: play_buzzer
       variables:
         song_str: string
       then:
@@ -220,7 +220,16 @@ text_sensor:
     ip_address:
       name: "IP Address"
       id: wifi_ip
-      entity_category: "diagnostic"
+  - platform: version
+    name: "ESPHome Version"
+    hide_timestamp: true
+    entity_category: "diagnostic"
+  - platform: template
+    name: "Apollo Firmware Version"
+    id: apollo_firmware_version
+    lambda: |-
+      return {"${version}"};
+    entity_category: "diagnostic"
 
 event:
   - platform: template
