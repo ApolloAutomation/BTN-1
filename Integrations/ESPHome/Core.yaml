@@ -112,6 +112,7 @@ api:
 
       # Send Wake up Button State
       - component.update: wakeup_button_pressed
+      - component.update: apollo_firmware_version
 
       # Check OTA Switch
       - delay: 3s
@@ -699,3 +700,4 @@ script:
       - component.update: sys_esp_temperature
       - component.update: sys_uptime
       - component.update: wakeup_button_pressed
+      - component.update: apollo_firmware_version
