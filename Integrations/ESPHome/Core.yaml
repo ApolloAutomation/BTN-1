@@ -132,8 +132,6 @@ api:
                 id: deep_sleep_1
 
 external_components:
-  - source: github://ApolloAutomation/ExternalComponents
-    components: [deep_sleep]
   - source: github://ApolloAutomation/esphome-battery-component
     components: [max17048] #Forked OptionZero
 
@@ -218,6 +216,11 @@ text_sensor:
     id: wakeup_button_pressed
     name: "Wake-up Button Pressed"
     icon: "mdi:gesture-tap-button"
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      id: wifi_ip
+      entity_category: "diagnostic"
 
 event:
   - platform: template
