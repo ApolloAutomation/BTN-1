@@ -13,7 +13,7 @@ esphome:
     name: "ApolloAutomation.BTN-1"
     version: "${version}"
 
-  min_version: 2023.11.1
+  min_version: 2025.6.0
 
   # Wake-up detection logic
   on_boot:
