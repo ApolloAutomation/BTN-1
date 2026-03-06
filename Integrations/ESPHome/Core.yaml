@@ -109,7 +109,9 @@ api:
 
       # Send Wake up Button State
       - component.update: wakeup_button_pressed
-      - component.update: apollo_firmware_version
+      - text_sensor.template.publish:
+          id: apollo_firmware_version
+          state: "${version}"
 
       # Check OTA Switch
       - delay: 3s
@@ -227,7 +229,6 @@ text_sensor:
     id: apollo_firmware_version
     lambda: |-
       return {"${version}"};
-    update_interval: never
     entity_category: "diagnostic"
 
 event:
@@ -697,4 +698,6 @@ script:
       - component.update: sys_esp_temperature
       - component.update: sys_uptime
       - component.update: wakeup_button_pressed
-      - component.update: apollo_firmware_version
+      - text_sensor.template.publish:
+          id: apollo_firmware_version
+          state: "${version}"
