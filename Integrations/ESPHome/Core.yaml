@@ -19,6 +19,9 @@ esphome:
   on_boot:
     - priority: 500
       then:
+        - text_sensor.template.publish:
+            id: apollo_firmware_version
+            state: "${version}"
         - lambda: |-
             id(deep_sleep_1).set_sleep_duration(id(deep_sleep_sleep_duration).state * 60 * 60 * 1000);
         - if:
@@ -109,7 +112,6 @@ api:
 
       # Send Wake up Button State
       - component.update: wakeup_button_pressed
-      - component.update: apollo_firmware_version
 
       # Check OTA Switch
       - delay: 3s
@@ -225,8 +227,6 @@ text_sensor:
   - platform: template
     name: "Apollo Firmware Version"
     id: apollo_firmware_version
-    lambda: |-
-      return {"${version}"};
     update_interval: never
     entity_category: "diagnostic"
 
@@ -697,4 +697,3 @@ script:
       - component.update: sys_esp_temperature
       - component.update: sys_uptime
       - component.update: wakeup_button_pressed
-      - component.update: apollo_firmware_version
