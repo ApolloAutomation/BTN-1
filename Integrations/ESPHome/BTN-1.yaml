@@ -25,11 +25,6 @@ update:
     source: https://apolloautomation.github.io/BTN-1/firmware/manifest.json
 
 wifi:
-  on_connect:
-    - delay: 5s
-    - ble.disable:
-  on_disconnect:
-    - ble.enable:
   ap:
     ssid: "Apollo BTN1 Hotspot"
 

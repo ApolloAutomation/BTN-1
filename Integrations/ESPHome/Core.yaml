@@ -1,6 +1,7 @@
 substitutions:
   name: apollo-btn-1
-  version: "25.12.5.1"
+  version: "26.3.2.1"
+
   device_description: ${name} made by Apollo Automation - version ${version}.
 
 
@@ -9,19 +10,19 @@ esphome:
   friendly_name: Apollo BTN-1
   comment: Apollo BTN-1
   name_add_mac_suffix: true
-  platformio_options:
-    board_build.flash_mode: dio
-
   project:
     name: "ApolloAutomation.BTN-1"
     version: "${version}"
 
-  min_version: 2023.11.1
+  min_version: 2025.6.0
 
   # Wake-up detection logic
   on_boot:
     - priority: 500
       then:
+        - text_sensor.template.publish:
+            id: apollo_firmware_version
+            state: "${version}"
         - lambda: |-
             id(deep_sleep_1).set_sleep_duration(id(deep_sleep_sleep_duration).state * 60 * 60 * 1000);
         - if:
@@ -86,8 +87,8 @@ esphome:
 
 api:
   reboot_timeout: 0s
-  services:
-    - service: play_buzzer
+  actions:
+    - action: play_buzzer
       variables:
         song_str: string
       then:
@@ -143,7 +144,6 @@ external_components:
     components: [max17048] #Forked OptionZero
 
 esp32:
-  board: esp32-c6-devkitm-1
   variant: esp32c6
   flash_size: 8MB
   framework:
@@ -173,6 +173,7 @@ captive_portal:
 web_server:
   id: web_server_instance
   port: 80
+  version: 3
 
 i2c:
   id: i2c_bus
@@ -231,6 +232,19 @@ text_sensor:
     id: wakeup_button_pressed
     name: "Wake-up Button Pressed"
     icon: "mdi:gesture-tap-button"
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      id: wifi_ip
+  - platform: version
+    name: "ESPHome Version"
+    hide_timestamp: true
+    entity_category: "diagnostic"
+  - platform: template
+    name: "Apollo Firmware Version"
+    id: apollo_firmware_version
+    update_interval: never
+    entity_category: "diagnostic"
 
 event:
   - platform: template
