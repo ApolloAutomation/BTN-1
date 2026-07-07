@@ -24,9 +24,13 @@ jobs:
       pull-requests: write
     with:
       device-name: btn-1
+      # BTN-1_Minimal.yaml is the end-user image served at firmware/ (OTA
+      # updates and dashboard adoption). BTN-1.yaml (improv + BLE) is only
+      # used for first flashes via the web installer.
       yaml-files: |
+        Integrations/ESPHome/BTN-1_Minimal.yaml
         Integrations/ESPHome/BTN-1.yaml
-      firmware-names: "1:firmware"
+      firmware-names: "1_Minimal:firmware,1:firmware-factory"
       core-yaml-path: Integrations/ESPHome/Core.yaml
       esphome-version: stable
       # Bypass check if manually triggered with bypass option
