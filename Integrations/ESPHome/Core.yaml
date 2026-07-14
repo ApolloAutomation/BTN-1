@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "26.7.12.1"
+  version: "26.7.14.1"
 
   device_description: ${name} made by Apollo Automation - version ${version}.
   # Default update channel on first boot (no stored user choice yet, i.e. a
@@ -116,6 +116,7 @@ esphome:
     - switch.turn_off: power_latch
 
 api:
+  encryption:
   reboot_timeout: 0s
   actions:
     - action: play_buzzer
