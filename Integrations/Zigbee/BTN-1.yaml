@@ -1,75 +1,424 @@
-# Apollo BTN-1 Zigbee Configuration
+# Apollo BTN-1 Zigbee Configuration (Zigbee2MQTT variant)
 #
-# This is a working Zigbee configuration for the BTN-1 that pairs with Home Assistant ZHA
+# Pairs with Zigbee2MQTT using the external converter apollo_btn1.js in this
+# directory. The ZHA variant of this firmware lives on the ZHA branch and
+# reports the model BTN-1-ZHA instead.
 #
-# Key features:
-# - Uses zigbee_esphome external component from luar123
-# - ESP32-C6 with native Zigbee support
-# - Custom partition table for Zigbee NVS storage
-# - Binary sensors for buttons (auto-discovered by ZHA)
-# - RGB LEDs for button backlighting
-# - Battery monitoring via MAX17048
-#
-# IMPORTANT - First Time Flashing:
-#   # Erase flash to clear any stale Zigbee network data
+# First time flashing over the Wi-Fi firmware, or after changing Zigbee
+# firmware versions:
 #   esptool.py --chip esp32c6 erase_flash
-#   # Then compile and flash
-#   esphome compile btn-1.yaml
-#   esphome upload btn-1.yaml --device /dev/cu.usbmodem*
+#   esphome compile BTN-1.yaml
+#   esphome upload BTN-1.yaml --device /dev/cu.usbmodem*
 #
-# Pairing:
-# 1. After flashing (with erased flash), device enters pairing mode automatically
-# 2. If device doesn't pair: Hold RESET button for 5-10 seconds to reset Zigbee
-# 3. In Home Assistant: Settings → Devices & Services → ZHA → Add Device
-# 4. Device appears as "Apollo BTN-1" with buttons, battery, and lights
+# Pairing: hold the side reset button for 5 to 10 seconds, then release.
+# The serial log shows "Zigbee reset, entering pairing mode". See
+# PAIRING_GUIDE.md for the full walkthrough.
+
+substitutions:
+  model: "BTN-1-Z2M"
 
 esphome:
   name: apollo-btn-1-zb
   friendly_name: "Apollo BTN-1 Zigbee"
+  comment: ${device_description}
+  min_version: 2026.3.0
+  project:
+    name: "apollo_automation.btn-1-zigbee"
+    version: ${version}
+  on_shutdown:
+    then:
+      - light.turn_off: rgb_light
 
 # ESP32-C6 Platform Configuration
+# The board key is intentionally absent; ESPHome resolves the generic
+# ESP32-C6 board from the variant (matches the main firmware).
 esp32:
-  board: esp32-c6-devkitm-1
   variant: esp32c6
   flash_size: 8MB
   partitions: partitions_zb.csv
   framework:
     type: esp-idf
-    sdkconfig_options:
-      CONFIG_ZB_ENABLED: y
-      CONFIG_ZB_ZCZR: y
-      CONFIG_ZB_ZED: n
 
-# External Components
+# External components, pinned to exact commits so every build is reproducible.
+# zigbee_esphome: v1.x (ZBOSS) line, newest commit compatible with ESPHome 2026.3.x.
+# The Zigbee role is managed by the zigbee component (router: false = end device),
+# not by manual sdkconfig flags: manual CONFIG_ZB_ZCZR/ZED entries are silently
+# overridden by the component and must not be added here.
 external_components:
-  # Zigbee support for ESP32-C6
-  - source: github://luar123/zigbee_esphome
+  - source: github://luar123/zigbee_esphome@98b54b83ab080628e661b8a28b8b03b6c3bc38bd
+    refresh: never
     components: [zigbee]
-  # MAX17048 battery fuel gauge (forked from OptionZero)
-  - source: github://ApolloAutomation/esphome-battery-component
+  - source: github://ApolloAutomation/esphome-battery-component@2f24e89a2a4bb02cda63ab074585904cd58247c4
+    refresh: never
     components: [max17048]
 
-# Zigbee Configuration
-# Using basic mode - endpoints auto-generated from components with names
+# Zigbee configuration: explicit endpoints, frozen layout.
+# EP1-4: Buttons 1-4 (BinaryInput raw state + MultistateInput action events).
+#        EP1 additionally carries the PowerConfiguration battery cluster.
+# EP5-8: BTN 1-4 Lights (color dimmable, XY color only).
+# Action values on the MultistateInput presentValue:
+#   0 none, 1 single click, 2 double click, 3 triple click, 4 hold
 zigbee:
   id: zb
-  components: all
   manufacturer: "Apollo Automation"
-  name: "BTN-1"
-  # debug: true  # Uncomment for Zigbee stack debug messages
+  name: ${model}
+  version: 1
+  date: "20260719"
+  power_supply: 3
+  router: false
   on_join:
     then:
       - logger.log:
           level: INFO
-          format: "*** ZIGBEE NETWORK JOINED ***"
+          format: "Zigbee network joined"
+      - script.execute: join_feedback
+  endpoints:
+    # Button 1 + battery
+    - device_type: CUSTOM_ATTR
+      num: 1
+      clusters:
+        - id: BINARY_INPUT
+          attributes:
+            - attribute_id: 0x55
+              type: BOOL
+              value: false
+              report: force
+              device: button_1
+            - attribute_id: 0x51
+              id: btn1_bi_oos
+              type: BOOL
+              value: false
+            - attribute_id: 0x6F
+              id: btn1_bi_flags
+              type: 8BITMAP
+              value: 0
+            - attribute_id: 0x1C
+              id: btn1_bi_desc
+              type: CHAR_STRING
+              value: "Button 1"
+              max_length: 16
+        - id: MULTI_INPUT
+          attributes:
+            - id: btn1_action
+              attribute_id: 0x55
+              type: U16
+              value: 0
+              report: force
+            - attribute_id: 0x4A
+              id: btn1_ms_states
+              type: U16
+              value: 5
+            - attribute_id: 0x51
+              id: btn1_ms_oos
+              type: BOOL
+              value: false
+            - attribute_id: 0x6F
+              id: btn1_ms_flags
+              type: 8BITMAP
+              value: 0
+            - attribute_id: 0x1C
+              id: btn1_ms_desc
+              type: CHAR_STRING
+              value: "Button 1 Action"
+              max_length: 16
+        - id: POWER_CONFIG
+          attributes:
+            # BatteryVoltage, ZCL unit is 100 mV
+            - attribute_id: 0x0020
+              type: U8
+              value: 0
+              report: true
+              device: batt_v
+              scale: 10
+            # BatteryPercentageRemaining, ZCL unit is half percent
+            - attribute_id: 0x0021
+              type: U8
+              value: 0
+              report: true
+              device: batt_pct
+              scale: 2
+    # Button 2
+    - device_type: CUSTOM_ATTR
+      num: 2
+      clusters:
+        - id: BINARY_INPUT
+          attributes:
+            - attribute_id: 0x55
+              type: BOOL
+              value: false
+              report: force
+              device: button_2
+            - attribute_id: 0x51
+              id: btn2_bi_oos
+              type: BOOL
+              value: false
+            - attribute_id: 0x6F
+              id: btn2_bi_flags
+              type: 8BITMAP
+              value: 0
+            - attribute_id: 0x1C
+              id: btn2_bi_desc
+              type: CHAR_STRING
+              value: "Button 2"
+              max_length: 16
+        - id: MULTI_INPUT
+          attributes:
+            - id: btn2_action
+              attribute_id: 0x55
+              type: U16
+              value: 0
+              report: force
+            - attribute_id: 0x4A
+              id: btn2_ms_states
+              type: U16
+              value: 5
+            - attribute_id: 0x51
+              id: btn2_ms_oos
+              type: BOOL
+              value: false
+            - attribute_id: 0x6F
+              id: btn2_ms_flags
+              type: 8BITMAP
+              value: 0
+            - attribute_id: 0x1C
+              id: btn2_ms_desc
+              type: CHAR_STRING
+              value: "Button 2 Action"
+              max_length: 16
+    # Button 3
+    - device_type: CUSTOM_ATTR
+      num: 3
+      clusters:
+        - id: BINARY_INPUT
+          attributes:
+            - attribute_id: 0x55
+              type: BOOL
+              value: false
+              report: force
+              device: button_3
+            - attribute_id: 0x51
+              id: btn3_bi_oos
+              type: BOOL
+              value: false
+            - attribute_id: 0x6F
+              id: btn3_bi_flags
+              type: 8BITMAP
+              value: 0
+            - attribute_id: 0x1C
+              id: btn3_bi_desc
+              type: CHAR_STRING
+              value: "Button 3"
+              max_length: 16
+        - id: MULTI_INPUT
+          attributes:
+            - id: btn3_action
+              attribute_id: 0x55
+              type: U16
+              value: 0
+              report: force
+            - attribute_id: 0x4A
+              id: btn3_ms_states
+              type: U16
+              value: 5
+            - attribute_id: 0x51
+              id: btn3_ms_oos
+              type: BOOL
+              value: false
+            - attribute_id: 0x6F
+              id: btn3_ms_flags
+              type: 8BITMAP
+              value: 0
+            - attribute_id: 0x1C
+              id: btn3_ms_desc
+              type: CHAR_STRING
+              value: "Button 3 Action"
+              max_length: 16
+    # Button 4
+    - device_type: CUSTOM_ATTR
+      num: 4
+      clusters:
+        - id: BINARY_INPUT
+          attributes:
+            - attribute_id: 0x55
+              type: BOOL
+              value: false
+              report: force
+              device: button_4
+            - attribute_id: 0x51
+              id: btn4_bi_oos
+              type: BOOL
+              value: false
+            - attribute_id: 0x6F
+              id: btn4_bi_flags
+              type: 8BITMAP
+              value: 0
+            - attribute_id: 0x1C
+              id: btn4_bi_desc
+              type: CHAR_STRING
+              value: "Button 4"
+              max_length: 16
+        - id: MULTI_INPUT
+          attributes:
+            - id: btn4_action
+              attribute_id: 0x55
+              type: U16
+              value: 0
+              report: force
+            - attribute_id: 0x4A
+              id: btn4_ms_states
+              type: U16
+              value: 5
+            - attribute_id: 0x51
+              id: btn4_ms_oos
+              type: BOOL
+              value: false
+            - attribute_id: 0x6F
+              id: btn4_ms_flags
+              type: 8BITMAP
+              value: 0
+            - attribute_id: 0x1C
+              id: btn4_ms_desc
+              type: CHAR_STRING
+              value: "Button 4 Action"
+              max_length: 16
+    # BTN 1 Light
+    - device_type: COLOR_DIMMABLE_LIGHT
+      num: 5
+      clusters:
+        - id: ON_OFF
+          attributes:
+            - attribute_id: 0x0
+              type: BOOL
+              value: false
+              report: true
+              device: btn_1_light
+        - id: LEVEL_CONTROL
+          attributes:
+            - attribute_id: 0x0
+              type: U8
+              value: 255
+              report: true
+              device: btn_1_light
+        - id: COLOR_CONTROL
+          attributes:
+            - attribute_id: 0x3
+              type: U16
+              value: 0x616B
+              report: true
+              device: btn_1_light
+            - attribute_id: 0x4
+              type: U16
+              value: 0x607D
+              report: true
+              device: btn_1_light
+            - attribute_id: 0x400A
+              type: 16BITMAP
+              value: 8
+    # BTN 2 Light
+    - device_type: COLOR_DIMMABLE_LIGHT
+      num: 6
+      clusters:
+        - id: ON_OFF
+          attributes:
+            - attribute_id: 0x0
+              type: BOOL
+              value: false
+              report: true
+              device: btn_2_light
+        - id: LEVEL_CONTROL
+          attributes:
+            - attribute_id: 0x0
+              type: U8
+              value: 255
+              report: true
+              device: btn_2_light
+        - id: COLOR_CONTROL
+          attributes:
+            - attribute_id: 0x3
+              type: U16
+              value: 0x616B
+              report: true
+              device: btn_2_light
+            - attribute_id: 0x4
+              type: U16
+              value: 0x607D
+              report: true
+              device: btn_2_light
+            - attribute_id: 0x400A
+              type: 16BITMAP
+              value: 8
+    # BTN 3 Light
+    - device_type: COLOR_DIMMABLE_LIGHT
+      num: 7
+      clusters:
+        - id: ON_OFF
+          attributes:
+            - attribute_id: 0x0
+              type: BOOL
+              value: false
+              report: true
+              device: btn_3_light
+        - id: LEVEL_CONTROL
+          attributes:
+            - attribute_id: 0x0
+              type: U8
+              value: 255
+              report: true
+              device: btn_3_light
+        - id: COLOR_CONTROL
+          attributes:
+            - attribute_id: 0x3
+              type: U16
+              value: 0x616B
+              report: true
+              device: btn_3_light
+            - attribute_id: 0x4
+              type: U16
+              value: 0x607D
+              report: true
+              device: btn_3_light
+            - attribute_id: 0x400A
+              type: 16BITMAP
+              value: 8
+    # BTN 4 Light
+    - device_type: COLOR_DIMMABLE_LIGHT
+      num: 8
+      clusters:
+        - id: ON_OFF
+          attributes:
+            - attribute_id: 0x0
+              type: BOOL
+              value: false
+              report: true
+              device: btn_4_light
+        - id: LEVEL_CONTROL
+          attributes:
+            - attribute_id: 0x0
+              type: U8
+              value: 255
+              report: true
+              device: btn_4_light
+        - id: COLOR_CONTROL
+          attributes:
+            - attribute_id: 0x3
+              type: U16
+              value: 0x616B
+              report: true
+              device: btn_4_light
+            - attribute_id: 0x4
+              type: U16
+              value: 0x607D
+              report: true
+              device: btn_4_light
+            - attribute_id: 0x400A
+              type: 16BITMAP
+              value: 8
 
-# ============================================
-# Include Hardware Configuration
-# ============================================
+# Hardware configuration
 packages:
   hardware: !include Core.yaml
 
-# Logging (serial only, no WiFi)
+# Logging (serial only, no Wi-Fi in this firmware)
 logger:
   level: INFO
   baud_rate: 115200

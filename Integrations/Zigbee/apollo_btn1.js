@@ -1,172 +1,123 @@
 /**
- * Zigbee2MQTT External Converter for Apollo BTN-1
+ * Zigbee2MQTT external converter for the Apollo Automation BTN-1
+ * (Zigbee firmware model BTN-1-Z2M, firmware 26.7.19.1-zigbee or newer).
  *
- * This converter supports the Apollo BTN-1 4-button Zigbee remote
- * built with the zigbee_esphome component.
+ * Installation on Zigbee2MQTT 2.x:
+ * 1. Copy this file into the external_converters folder inside your
+ *    Zigbee2MQTT data directory (create the folder if it does not exist).
+ * 2. Restart Zigbee2MQTT.
+ * 3. Pair the BTN-1, or re-interview it if it was already paired.
  *
- * Installation:
- * 1. Copy this file to your Zigbee2MQTT external_converters directory
- *    (typically: /config/zigbee2mqtt/ or where your configuration.yaml is)
- * 2. Add to your Zigbee2MQTT configuration.yaml:
- *    external_converters:
- *      - apollo_btn1.js
- * 3. Restart Zigbee2MQTT
- * 4. Remove and re-pair your BTN-1 device
+ * On Zigbee2MQTT 1.x, additionally list the file under external_converters
+ * in configuration.yaml.
  *
- * Debugging:
- * If entities don't appear correctly, check the device interview in Z2M:
- * - Go to Z2M frontend → Device → Dev console → Read clusters
- * - Note the actual endpoint numbers and adjust the endpoint() function below
- *
- * Device features:
- * - 4 buttons (binary input clusters)
- * - 4 RGB LED backlights (color light clusters)
- * - Battery level and voltage (power configuration cluster)
- * - Prevent sleep switch
+ * Endpoint map (fixed by the firmware):
+ *   1-4: Buttons 1-4. genBinaryInput presentValue = raw pressed state.
+ *        genMultistateInput presentValue = action event:
+ *        1 single, 2 double, 3 triple, 4 hold.
+ *        Endpoint 1 also carries genPowerCfg (battery).
+ *   5-8: BTN 1-4 Lights. genOnOff, genLevelCtrl, lightingColorCtrl (XY only).
  */
 
 const fz = require('zigbee-herdsman-converters/converters/fromZigbee');
-const tz = require('zigbee-herdsman-converters/converters/toZigbee');
 const exposes = require('zigbee-herdsman-converters/lib/exposes');
 const reporting = require('zigbee-herdsman-converters/lib/reporting');
-const utils = require('zigbee-herdsman-converters/lib/utils');
+const {light} = require('zigbee-herdsman-converters/lib/modernExtend');
 const e = exposes.presets;
 const ea = exposes.access;
 
-// Custom fromZigbee converter for binary input (button presses)
+const BUTTON_ENDPOINTS = [1, 2, 3, 4];
+const LIGHT_ENDPOINTS = [5, 6, 7, 8];
+const ACTION_NAMES = {1: 'single', 2: 'double', 3: 'triple', 4: 'hold'};
+
 const fzLocal = {
-    binary_input: {
+    // Raw pressed state from genBinaryInput on endpoints 1-4
+    button_state: {
         cluster: 'genBinaryInput',
         type: ['attributeReport', 'readResponse'],
         convert: (model, msg, publish, options, meta) => {
-            const endpoint = msg.endpoint.ID;
-            const value = msg.data['presentValue'];
-
-            // Map endpoint to button number (adjust based on actual device)
-            let buttonNum = endpoint;
-            if (endpoint >= 1 && endpoint <= 4) {
-                buttonNum = endpoint;
-            }
-
-            const action = value ? `button_${buttonNum}_press` : `button_${buttonNum}_release`;
-            return {action};
+            const ep = msg.endpoint.ID;
+            if (!BUTTON_ENDPOINTS.includes(ep)) return;
+            if (msg.data.presentValue === undefined) return;
+            return {[`button_${ep}_pressed`]: msg.data.presentValue === 1 || msg.data.presentValue === true};
+        },
+    },
+    // Action events from genMultistateInput on endpoints 1-4
+    button_action: {
+        cluster: 'genMultistateInput',
+        type: ['attributeReport'],
+        convert: (model, msg, publish, options, meta) => {
+            const ep = msg.endpoint.ID;
+            if (!BUTTON_ENDPOINTS.includes(ep)) return;
+            const name = ACTION_NAMES[msg.data.presentValue];
+            if (!name) return;
+            return {action: `button_${ep}_${name}`};
         },
     },
 };
 
 const definition = {
-    zigbeeModel: ['BTN-1'],
+    zigbeeModel: ['BTN-1-Z2M'],
     model: 'BTN-1',
     vendor: 'Apollo Automation',
-    description: 'Apollo BTN-1 4-button Zigbee remote with RGB backlighting and battery',
+    description: 'Four button Zigbee macro deck with RGB backlighting and battery monitoring',
 
-    fromZigbee: [
-        fzLocal.binary_input,
-        fz.on_off,
-        fz.brightness,
-        fz.color_colortemp,
-        fz.battery,
+    extend: [
+        light({
+            color: {modes: ['xy']},
+            endpointNames: ['l1', 'l2', 'l3', 'l4'],
+        }),
     ],
 
-    toZigbee: [
-        tz.on_off,
-        tz.light_onoff_brightness,
-        tz.light_color,
-        tz.light_color_colortemp,
-    ],
+    fromZigbee: [fzLocal.button_state, fzLocal.button_action, fz.battery],
+    toZigbee: [],
 
     exposes: [
-        // Button actions
         e.action([
-            'button_1_press', 'button_1_release',
-            'button_2_press', 'button_2_release',
-            'button_3_press', 'button_3_release',
-            'button_4_press', 'button_4_release',
+            'button_1_single', 'button_1_double', 'button_1_triple', 'button_1_hold',
+            'button_2_single', 'button_2_double', 'button_2_triple', 'button_2_hold',
+            'button_3_single', 'button_3_double', 'button_3_triple', 'button_3_hold',
+            'button_4_single', 'button_4_double', 'button_4_triple', 'button_4_hold',
         ]),
-
-        // Battery
+        e.binary('button_1_pressed', ea.STATE, true, false)
+            .withDescription('Button 1 raw pressed state'),
+        e.binary('button_2_pressed', ea.STATE, true, false)
+            .withDescription('Button 2 raw pressed state'),
+        e.binary('button_3_pressed', ea.STATE, true, false)
+            .withDescription('Button 3 raw pressed state'),
+        e.binary('button_4_pressed', ea.STATE, true, false)
+            .withDescription('Button 4 raw pressed state'),
         e.battery(),
         e.battery_voltage(),
-
-        // RGB Lights (one per button)
-        // Endpoint names should match what the device reports
-        e.light_brightness_color({colorTempRange: undefined}).withEndpoint('btn_1_light'),
-        e.light_brightness_color({colorTempRange: undefined}).withEndpoint('btn_2_light'),
-        e.light_brightness_color({colorTempRange: undefined}).withEndpoint('btn_3_light'),
-        e.light_brightness_color({colorTempRange: undefined}).withEndpoint('btn_4_light'),
-
-        // Prevent sleep switch
-        e.switch().withEndpoint('prevent_sleep'),
     ],
 
     endpoint: (device) => {
-        // Endpoint mapping - zigbee_esphome assigns endpoints sequentially
-        // Based on Core.yaml component order:
-        // 1-4: Buttons (binary_sensor)
-        // 5-6: Battery sensors
-        // 7: Prevent Sleep switch
-        // 8-11: Lights (btn_1_light through btn_4_light)
-        //
-        // NOTE: These numbers may need adjustment!
-        // Check device interview in Z2M Dev Console to verify actual endpoints.
         return {
-            'button_1': 1,
-            'button_2': 2,
-            'button_3': 3,
-            'button_4': 4,
-            'battery': 5,
-            'prevent_sleep': 7,
-            'btn_1_light': 8,
-            'btn_2_light': 9,
-            'btn_3_light': 10,
-            'btn_4_light': 11,
+            'l1': 5, 'l2': 6, 'l3': 7, 'l4': 8,
         };
     },
 
     meta: {
         multiEndpoint: true,
-        multiEndpointSkip: ['battery', 'battery_voltage'],
+        multiEndpointSkip: ['battery', 'voltage', 'action'],
     },
 
-    configure: async (device, coordinatorEndpoint, logger) => {
-        // Iterate through all endpoints and configure appropriate clusters
-        for (const endpoint of device.endpoints) {
-            const epId = endpoint.ID;
-
-            try {
-                // Battery reporting (genPowerCfg cluster)
-                if (endpoint.supportsInputCluster('genPowerCfg')) {
-                    await reporting.bind(endpoint, coordinatorEndpoint, ['genPowerCfg']);
-                    await reporting.batteryPercentageRemaining(endpoint);
-                    await reporting.batteryVoltage(endpoint);
-                    logger.info(`BTN-1: Configured battery reporting on endpoint ${epId}`);
-                }
-
-                // Binary input for buttons (genBinaryInput cluster)
-                if (endpoint.supportsInputCluster('genBinaryInput')) {
-                    await reporting.bind(endpoint, coordinatorEndpoint, ['genBinaryInput']);
-                    logger.info(`BTN-1: Configured binary input on endpoint ${epId}`);
-                }
-
-                // On/Off for switches
-                if (endpoint.supportsInputCluster('genOnOff')) {
-                    await reporting.bind(endpoint, coordinatorEndpoint, ['genOnOff']);
-                    await reporting.onOff(endpoint);
-                    logger.info(`BTN-1: Configured on/off on endpoint ${epId}`);
-                }
-
-                // Light clusters
-                if (endpoint.supportsInputCluster('lightingColorCtrl')) {
-                    await reporting.bind(endpoint, coordinatorEndpoint, [
-                        'genOnOff',
-                        'genLevelCtrl',
-                        'lightingColorCtrl'
-                    ]);
-                    logger.info(`BTN-1: Configured light on endpoint ${epId}`);
-                }
-            } catch (e) {
-                logger.warn(`BTN-1: Failed to configure endpoint ${epId}: ${e.message}`);
-            }
+    configure: async (device, coordinatorEndpoint) => {
+        for (const epId of BUTTON_ENDPOINTS) {
+            const endpoint = device.getEndpoint(epId);
+            if (!endpoint) continue;
+            await reporting.bind(endpoint, coordinatorEndpoint, ['genBinaryInput', 'genMultistateInput']);
+        }
+        const ep1 = device.getEndpoint(1);
+        if (ep1 && ep1.supportsInputCluster('genPowerCfg')) {
+            await reporting.bind(ep1, coordinatorEndpoint, ['genPowerCfg']);
+            await reporting.batteryPercentageRemaining(ep1);
+            await reporting.batteryVoltage(ep1);
+        }
+        for (const epId of LIGHT_ENDPOINTS) {
+            const endpoint = device.getEndpoint(epId);
+            if (!endpoint) continue;
+            await reporting.bind(endpoint, coordinatorEndpoint, ['genOnOff', 'genLevelCtrl', 'lightingColorCtrl']);
         }
     },
 };
