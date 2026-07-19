@@ -5,11 +5,14 @@
  * Installation on Zigbee2MQTT 2.x:
  * 1. Copy this file into the external_converters folder inside your
  *    Zigbee2MQTT data directory (create the folder if it does not exist).
- * 2. Restart Zigbee2MQTT.
- * 3. Pair the BTN-1, or re-interview it if it was already paired.
+ * 2. On Zigbee2MQTT 2.11.0 and later, set enable_external_js: true under
+ *    advanced options in configuration.yaml (external converters are
+ *    disabled by default there).
+ * 3. Restart Zigbee2MQTT.
+ * 4. Pair the BTN-1, or re-interview it if it was already paired.
  *
- * On Zigbee2MQTT 1.x, additionally list the file under external_converters
- * in configuration.yaml.
+ * Zigbee2MQTT 2.x loads external converters as ES modules, which is why
+ * this file uses import/export and the .mjs extension.
  *
  * Endpoint map (fixed by the firmware):
  *   1-4: Buttons 1-4. genBinaryInput presentValue = raw pressed state.
@@ -19,10 +22,11 @@
  *   5-8: BTN 1-4 Lights. genOnOff, genLevelCtrl, lightingColorCtrl (XY only).
  */
 
-const fz = require('zigbee-herdsman-converters/converters/fromZigbee');
-const exposes = require('zigbee-herdsman-converters/lib/exposes');
-const reporting = require('zigbee-herdsman-converters/lib/reporting');
-const {light} = require('zigbee-herdsman-converters/lib/modernExtend');
+import * as fz from 'zigbee-herdsman-converters/converters/fromZigbee';
+import * as exposes from 'zigbee-herdsman-converters/lib/exposes';
+import * as reporting from 'zigbee-herdsman-converters/lib/reporting';
+import {light} from 'zigbee-herdsman-converters/lib/modernExtend';
+
 const e = exposes.presets;
 const ea = exposes.access;
 
@@ -56,7 +60,7 @@ const fzLocal = {
     },
 };
 
-const definition = {
+export default {
     zigbeeModel: ['BTN-1-Z2M'],
     model: 'BTN-1',
     vendor: 'Apollo Automation',
@@ -65,7 +69,9 @@ const definition = {
     extend: [
         light({
             color: {modes: ['xy']},
-            endpointNames: ['l1', 'l2', 'l3', 'l4'],
+            endpointNames: ['light_1', 'light_2', 'light_3', 'light_4'],
+            powerOnBehavior: false,
+            effect: false,
         }),
     ],
 
@@ -93,7 +99,7 @@ const definition = {
 
     endpoint: (device) => {
         return {
-            'l1': 5, 'l2': 6, 'l3': 7, 'l4': 8,
+            'light_1': 5, 'light_2': 6, 'light_3': 7, 'light_4': 8,
         };
     },
 
@@ -121,5 +127,3 @@ const definition = {
         }
     },
 };
-
-module.exports = definition;

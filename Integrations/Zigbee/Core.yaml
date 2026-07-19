@@ -108,23 +108,33 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
+    on_press:
+      then:
+        - zigbee.reportAttr: btn1_state
+    on_release:
+      then:
+        - zigbee.reportAttr: btn1_state
     on_multi_click:
       - timing:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn1_action
-              value: 1
+          - script.execute:
+              id: send_action
+              button: 1
+              action: 1
+      # The closing quiet period matches single and triple, so a slow triple
+      # click cannot fire double and triple on the same gesture.
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.2s
+          - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn1_action
-              value: 2
+          - script.execute:
+              id: send_action
+              button: 1
+              action: 2
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
@@ -133,16 +143,18 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn1_action
-              value: 3
+          - script.execute:
+              id: send_action
+              button: 1
+              action: 3
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn1_action
-              value: 4
+          - script.execute:
+              id: send_action
+              button: 1
+              action: 4
 
   # Button 2 (GPIO4)
   - platform: gpio
@@ -155,23 +167,33 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
+    on_press:
+      then:
+        - zigbee.reportAttr: btn2_state
+    on_release:
+      then:
+        - zigbee.reportAttr: btn2_state
     on_multi_click:
       - timing:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn2_action
-              value: 1
+          - script.execute:
+              id: send_action
+              button: 2
+              action: 1
+      # The closing quiet period matches single and triple, so a slow triple
+      # click cannot fire double and triple on the same gesture.
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.2s
+          - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn2_action
-              value: 2
+          - script.execute:
+              id: send_action
+              button: 2
+              action: 2
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
@@ -180,16 +202,18 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn2_action
-              value: 3
+          - script.execute:
+              id: send_action
+              button: 2
+              action: 3
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn2_action
-              value: 4
+          - script.execute:
+              id: send_action
+              button: 2
+              action: 4
 
   # Button 3 (GPIO6)
   - platform: gpio
@@ -202,23 +226,33 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
+    on_press:
+      then:
+        - zigbee.reportAttr: btn3_state
+    on_release:
+      then:
+        - zigbee.reportAttr: btn3_state
     on_multi_click:
       - timing:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn3_action
-              value: 1
+          - script.execute:
+              id: send_action
+              button: 3
+              action: 1
+      # The closing quiet period matches single and triple, so a slow triple
+      # click cannot fire double and triple on the same gesture.
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.2s
+          - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn3_action
-              value: 2
+          - script.execute:
+              id: send_action
+              button: 3
+              action: 2
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
@@ -227,16 +261,18 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn3_action
-              value: 3
+          - script.execute:
+              id: send_action
+              button: 3
+              action: 3
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn3_action
-              value: 4
+          - script.execute:
+              id: send_action
+              button: 3
+              action: 4
 
   # Button 4 (GPIO5)
   - platform: gpio
@@ -249,23 +285,33 @@ binary_sensor:
         pulldown: true
     filters:
       - delayed_off: 10ms
+    on_press:
+      then:
+        - zigbee.reportAttr: btn4_state
+    on_release:
+      then:
+        - zigbee.reportAttr: btn4_state
     on_multi_click:
       - timing:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn4_action
-              value: 1
+          - script.execute:
+              id: send_action
+              button: 4
+              action: 1
+      # The closing quiet period matches single and triple, so a slow triple
+      # click cannot fire double and triple on the same gesture.
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
           - ON for at most 300ms
-          - OFF for at least 0.2s
+          - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn4_action
-              value: 2
+          - script.execute:
+              id: send_action
+              button: 4
+              action: 2
       - timing:
           - ON for at most 300ms
           - OFF for at most 0.5s
@@ -274,16 +320,18 @@ binary_sensor:
           - ON for at most 300ms
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn4_action
-              value: 3
+          - script.execute:
+              id: send_action
+              button: 4
+              action: 3
       - timing:
           - ON for 1s to 5s
           - OFF for at least 0.5s
         then:
-          - zigbee.setAttr:
-              id: btn4_action
-              value: 4
+          - script.execute:
+              id: send_action
+              button: 4
+              action: 4
 
 # ============================================
 # Battery Monitoring (MAX17048)
@@ -395,7 +443,9 @@ script:
       - delay: 2s
       - light.turn_off: rgb_light
 
-  # Join status on tap of the reset button: blue joined, yellow not joined
+  # Join status on tap of the reset button: blue joined, yellow not joined.
+  # Uses only the button 1 light so coordinator-set colors on the other
+  # three lights survive; see ZIGBEE_NOTES.md on local feedback.
   - id: status_check
     mode: restart
     then:
@@ -404,17 +454,63 @@ script:
             lambda: 'return id(zb).is_connected();'
           then:
             - light.turn_on:
-                id: rgb_light
+                id: btn_1_light
                 red: 0%
                 green: 0%
                 blue: 100%
                 brightness: 60%
           else:
             - light.turn_on:
-                id: rgb_light
+                id: btn_1_light
                 red: 100%
                 green: 100%
                 blue: 0%
                 brightness: 60%
       - delay: 3s
-      - light.turn_off: rgb_light
+      - light.turn_off: btn_1_light
+
+  # Action fan-in: sets and reports the multistate attribute for one button.
+  # Gated on being joined so presses before the first join cannot queue and
+  # replay as phantom events at join time.
+  - id: send_action
+    mode: queued
+    parameters:
+      button: int
+      action: int
+    then:
+      - if:
+          condition:
+            lambda: 'return id(zb).is_connected();'
+          then:
+            - if:
+                condition:
+                  lambda: 'return button == 1;'
+                then:
+                  - zigbee.setAttr:
+                      id: btn1_action
+                      value: !lambda 'return action;'
+                  - zigbee.reportAttr: btn1_action
+            - if:
+                condition:
+                  lambda: 'return button == 2;'
+                then:
+                  - zigbee.setAttr:
+                      id: btn2_action
+                      value: !lambda 'return action;'
+                  - zigbee.reportAttr: btn2_action
+            - if:
+                condition:
+                  lambda: 'return button == 3;'
+                then:
+                  - zigbee.setAttr:
+                      id: btn3_action
+                      value: !lambda 'return action;'
+                  - zigbee.reportAttr: btn3_action
+            - if:
+                condition:
+                  lambda: 'return button == 4;'
+                then:
+                  - zigbee.setAttr:
+                      id: btn4_action
+                      value: !lambda 'return action;'
+                  - zigbee.reportAttr: btn4_action

@@ -9,7 +9,7 @@ Two branches carry this firmware. They are intentionally identical except for th
 | `substitutions: model` in BTN-1.yaml | "BTN-1-Z2M" | "BTN-1-ZHA" |
 | BTN-1.yaml header comment | Zigbee2MQTT wording | ZHA wording |
 | apollo_btn1_quirk.py | absent | present |
-| apollo_btn1.js | canonical copy | carried for reference |
+| apollo_btn1.mjs | canonical copy | carried for reference |
 | Readme.md / PAIRING_GUIDE.md | Z2M instructions | ZHA instructions |
 
 Everything else, including Core.yaml (byte for byte), the endpoint map, partitions_zb.csv, and the component pins, must be identical.

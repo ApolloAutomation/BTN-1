@@ -39,3 +39,22 @@
 | F2-21 | Wrong-case filename in flash instructions; wrong on-air name claim | Fixed in the new headers and docs |
 | F2-22 | Reset tier comment misstated the real windows | Fixed: tiers now match their documentation |
 | F2-23..F2-35 | Docs: nonexistent paths and files, invalid config snippet, impossible entity tables, inverted troubleshooting advice, wrong factory reset claims, placeholder image, stale HA/Z2M UI references | Fixed: PAIRING_GUIDE.md and Readme.md rewritten from the actual code on both branches |
+
+## Review round two (post-implementation, adversarially verified)
+
+A second review of the reworked firmware confirmed and fixed the following in 26.7.19.1-zigbee:
+
+| ID | Summary | Disposition |
+| --- | --- | --- |
+| R2-1 | Double and triple click could both fire on one slow triple (double's closing quiet period was 0.2 s vs 0.5 s elsewhere) | Fixed: double now ends with the same 0.5 s quiet period; tiers are mutually exclusive. The Wi-Fi firmware carries the same overlap; flagged for a separate fix there |
+| R2-2 | report: force also registered engine reporting, opening a duplicate-event window per click | Fixed: engine reporting off for button state and action attributes; explicit single-attribute reports in the automations |
+| R2-3 | Description strings padded to max_length with uninitialized heap bytes at this component pin | Fixed: max_length auto-fits each literal; also listed as an upstream issue |
+| R2-4 | Converters were CommonJS; Zigbee2MQTT 2.x loads ES modules and 2.11+ additionally gates them behind enable_external_js | Fixed: apollo_btn1.mjs (ESM), docs updated |
+| R2-5 | modernExtend light defaults exposed power_on_behavior and effect the firmware does not support | Fixed: both disabled in the converter |
+| R2-6 | ZHA quirk entities duplicated ZHA's native BinaryInput entities | Fixed: prevent_default_entity_creation on the button endpoints (ZHA branch) |
+| R2-7 | Pre-join button presses could queue and replay as phantom action events at join | Fixed: action reports gated on joined state |
+| R2-8 | Battery scale truncated instead of rounding | Fixed: rounding lambdas |
+| R2-9 | Whole-strip status feedback blanked coordinator-set lights | Reduced: status uses only the Button 1 light; residual one-way-state limitation documented |
+| R2-10 | Stale defective prebuilt binary still shipped in releases/ | Fixed: removed; Readme points to building from source |
+| R2-11 | Z2M light endpoints were named l1-l4 | Fixed: light_1 to light_4 |
+| R2-12 | Doc file trees omitted the handoff docs; example entity ids presupposed names | Fixed in both docs |
