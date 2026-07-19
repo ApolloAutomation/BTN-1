@@ -44,18 +44,23 @@ This branch carries the ZHA variant (model `BTN-1-ZHA`), which pairs with Home A
 
 ```
 Zigbee/
-  Readme.md            This file
-  PAIRING_GUIDE.md     Pairing walkthrough for ZHA
-  BTN-1.yaml           Firmware entry point (platform, Zigbee endpoints)
-  Core.yaml            Hardware package (buttons, LEDs, battery, feedback)
-  apollo_btn1_quirk.py ZHA quirk (button triggers, entity names)
-  apollo_btn1.js       Zigbee2MQTT external converter (for the z2m variant)
-  partitions_zb.csv    Partition table with Zigbee NVRAM regions
-  ZIGBEE_NOTES.md      Endpoint map, reporting, and design notes
-  releases/            Prebuilt binary from an earlier firmware revision.
-                       It predates the current endpoint layout and converter;
-                       build from source instead.
+  Readme.md                  This file
+  PAIRING_GUIDE.md           Pairing walkthrough for ZHA
+  BTN-1.yaml                 Firmware entry point (platform, Zigbee endpoints)
+  Core.yaml                  Hardware package (buttons, LEDs, battery, feedback)
+  apollo_btn1_quirk.py       ZHA quirk (button triggers, entity names)
+  apollo_btn1.mjs            Zigbee2MQTT external converter (for the z2m variant)
+  partitions_zb.csv          Partition table with Zigbee NVRAM regions
+  ZIGBEE_NOTES.md            Endpoint map, reporting, and design notes
+  HARDWARE_VERIFICATION.md   Ordered on-device test checklist
+  BRANCH_PARITY.md           Allowed differences between the two branches
+  BACKPORT_LOG.md            What came across from the Wi-Fi Core.yaml
+  DEFECT_LOG.md              Audit findings and their dispositions
+  ZIGBEE_BEFORE_*.txt        Signature records, pre-rework
+  ZIGBEE_AFTER_*.txt         Signature records, post-rework
 ```
+
+There is no prebuilt binary: the earlier release predated this rework and its converter could not work, so it was removed. Build from source below.
 
 ## Building and flashing
 

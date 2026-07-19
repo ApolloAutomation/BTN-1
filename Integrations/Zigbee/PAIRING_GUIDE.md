@@ -40,7 +40,7 @@ With the quirk installed:
 - Battery percentage and voltage sensors.
 - Four lights, one per button, with on/off, brightness, and XY color.
 
-Without the quirk, the lights and battery still work, the raw button states appear as generic binary sensors, and the action values appear as generic multistate sensors instead of triggers.
+Without the quirk, the lights and battery still work and the raw button states appear as generic binary sensors, but the action values are not surfaced at all: no triggers, no events. Install the quirk to use the buttons.
 
 ## Example automation
 
@@ -59,7 +59,9 @@ automation:
           entity_id: light.living_room
 ```
 
-You can also listen for the raw events on the `zha_event` bus; the command field carries names like `button_2_double`.
+You can also listen for the raw events on the `zha_event` bus; the command field carries names like `button_2_double`. Entity ids elsewhere in this guide depend on the device name Home Assistant assigns; find the real ids on the device page.
+
+If a re-pair ever shows duplicate generic entities next to the named ones, the quirk was updated after pairing; remove and re-pair the device so the entity set regenerates.
 
 ## Reset button reference
 

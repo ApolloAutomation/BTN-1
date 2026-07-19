@@ -14,7 +14,8 @@ What this quirk adds on top of ZHA's native discovery:
 - Device automation triggers for every button action (single, double,
   triple, hold on buttons 1 to 4), so the actions appear in the Home
   Assistant automation editor as device triggers.
-- Named binary sensors for the raw pressed state of each button.
+- Named binary sensors for the raw pressed state of each button, replacing
+  the generic entities ZHA would otherwise create for those clusters.
 
 The lights on endpoints 5 to 8 and the battery on endpoint 1 are standard
 clusters that ZHA handles without a quirk.
@@ -30,7 +31,11 @@ Firmware endpoint map (fixed):
 from zigpy.quirks import CustomCluster
 from zigpy.zcl.clusters.general import BinaryInput, MultistateInput
 
-from zhaquirks.builder import EntityType, QuirkBuilder
+try:
+    from zhaquirks.builder import EntityType, QuirkBuilder
+except ImportError:
+    # Older Home Assistant releases ship QuirkBuilder under zigpy
+    from zigpy.quirks.v2 import EntityType, QuirkBuilder
 from zhaquirks.const import (
     COMMAND,
     DOUBLE_PRESS,
@@ -83,6 +88,9 @@ for _ep in (1, 2, 3, 4):
     _builder = _builder.replaces(
         ApolloButtonEvents,
         endpoint_id=_ep,
+    ).prevent_default_entity_creation(
+        endpoint_id=_ep,
+        cluster_id=BinaryInput.cluster_id,
     ).binary_sensor(
         "present_value",
         BinaryInput.cluster_id,
