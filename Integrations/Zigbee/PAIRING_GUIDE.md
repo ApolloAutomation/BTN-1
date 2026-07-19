@@ -10,11 +10,18 @@ This guide covers the Zigbee2MQTT variant of the BTN-1 Zigbee firmware (model `B
 
 ## Step 1: Install the external converter
 
-1. Copy `apollo_btn1.js` into the `external_converters` folder inside your Zigbee2MQTT data directory. Create the folder if it does not exist. The data directory is the one that contains Zigbee2MQTT's `configuration.yaml`.
-2. Restart Zigbee2MQTT.
-3. Check the Zigbee2MQTT log for a line confirming the external converter loaded.
+1. Copy `apollo_btn1.mjs` into the `external_converters` folder inside your Zigbee2MQTT data directory. Create the folder if it does not exist. The data directory is the one that contains Zigbee2MQTT's `configuration.yaml`.
+2. On Zigbee2MQTT 2.11.0 and later, enable external converters in `configuration.yaml` (they are off by default there):
 
-On Zigbee2MQTT 1.x, additionally add the file name under `external_converters:` in `configuration.yaml` before restarting.
+   ```yaml
+   advanced:
+     enable_external_js: true
+   ```
+
+3. Restart Zigbee2MQTT.
+4. Check the Zigbee2MQTT log for a line confirming the external converter loaded.
+
+Zigbee2MQTT 1.x cannot load this converter (it predates the ES module format); use Zigbee2MQTT 2.x.
 
 ## Step 2: Pair
 
@@ -30,7 +37,7 @@ A freshly flashed device (after `erase_flash`) enters pairing mode on its own; t
 - `action`: button events named `button_1_single`, `button_1_double`, `button_1_triple`, `button_1_hold`, and the same for buttons 2 to 4.
 - `button_1_pressed` to `button_4_pressed`: raw pressed state, for automations that need press and release.
 - `battery` and `voltage`: from the standard battery cluster.
-- Four lights (`l1` to `l4`): on/off, brightness, and XY color per button.
+- Four lights (`light_1` to `light_4`): on/off, brightness, and XY color per button.
 
 ## Example automation (Home Assistant)
 
@@ -51,12 +58,12 @@ automation:
           entity_id: light.living_room
 ```
 
-LED feedback works the same as any light:
+LED feedback works the same as any light. The exact entity id depends on the friendly name you give the device in Zigbee2MQTT; find it on the device page. With a device named `btn_1` it looks like:
 
 ```yaml
       - service: light.turn_on
         target:
-          entity_id: light.btn_1_l1
+          entity_id: light.btn_1_light_1
         data:
           rgb_color: [0, 255, 0]
           brightness: 128
