@@ -1,8 +1,9 @@
-# Apollo BTN-1 Zigbee Configuration (Zigbee2MQTT variant)
+# Apollo BTN-1 Zigbee Configuration (ZHA variant)
 #
-# Pairs with Zigbee2MQTT using the external converter apollo_btn1.js in this
-# directory. The ZHA variant of this firmware lives on the ZHA branch and
-# reports the model BTN-1-ZHA instead.
+# Pairs with Home Assistant ZHA. The quirk apollo_btn1_quirk.py in this
+# directory adds button event triggers and friendly entity names. The
+# Zigbee2MQTT variant of this firmware lives on the z2m branch and reports
+# the model BTN-1-Z2M instead.
 #
 # First time flashing over the Wi-Fi firmware, or after changing Zigbee
 # firmware versions:
@@ -15,7 +16,7 @@
 # PAIRING_GUIDE.md for the full walkthrough.
 
 substitutions:
-  model: "BTN-1-Z2M"
+  model: "BTN-1-ZHA"
 
 esphome:
   name: apollo-btn-1-zb

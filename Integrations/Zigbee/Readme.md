@@ -1,8 +1,8 @@
-# Apollo BTN-1 Zigbee Firmware (Zigbee2MQTT variant)
+# Apollo BTN-1 Zigbee Firmware (ZHA variant)
 
 This directory contains an alternative Zigbee firmware for the Apollo BTN-1. It is not Apollo's main firmware for this product. The BTN-1 ships with ESPHome Wi-Fi firmware; the ESP32-C6 gives it Wi-Fi, Bluetooth LE, and Thread on the same chip, and Zigbee is also possible at the chip level for advanced users. This firmware is exactly that advanced case.
 
-This branch carries the Zigbee2MQTT variant (model `BTN-1-Z2M`), which pairs with Zigbee2MQTT using the external converter `apollo_btn1.js` in this directory. A ZHA variant (model `BTN-1-ZHA`) lives on the `ZHA` branch.
+This branch carries the ZHA variant (model `BTN-1-ZHA`), which pairs with Home Assistant ZHA. The quirk `apollo_btn1_quirk.py` in this directory adds button event triggers and friendly entity names. A Zigbee2MQTT variant (model `BTN-1-Z2M`) lives on the `z2m` branch.
 
 ## What you get
 
@@ -45,10 +45,11 @@ This branch carries the Zigbee2MQTT variant (model `BTN-1-Z2M`), which pairs wit
 ```
 Zigbee/
   Readme.md            This file
-  PAIRING_GUIDE.md     Pairing walkthrough for Zigbee2MQTT
+  PAIRING_GUIDE.md     Pairing walkthrough for ZHA
   BTN-1.yaml           Firmware entry point (platform, Zigbee endpoints)
   Core.yaml            Hardware package (buttons, LEDs, battery, feedback)
-  apollo_btn1.js       Zigbee2MQTT external converter
+  apollo_btn1_quirk.py ZHA quirk (button triggers, entity names)
+  apollo_btn1.js       Zigbee2MQTT external converter (for the z2m variant)
   partitions_zb.csv    Partition table with Zigbee NVRAM regions
   ZIGBEE_NOTES.md      Endpoint map, reporting, and design notes
   releases/            Prebuilt binary from an earlier firmware revision.
@@ -86,7 +87,7 @@ The external components are pinned to exact commits inside `BTN-1.yaml`, so buil
 | 7 | BTN 3 Light | OnOff, LevelControl, ColorControl (XY) |
 | 8 | BTN 4 Light | OnOff, LevelControl, ColorControl (XY) |
 
-MultistateInput action values: 1 single, 2 double, 3 triple, 4 hold. A hold is a press of 1 to 5 seconds. Identity on the air: manufacturer "Apollo Automation", model "BTN-1-Z2M".
+MultistateInput action values: 1 single, 2 double, 3 triple, 4 hold. A hold is a press of 1 to 5 seconds. Identity on the air: manufacturer "Apollo Automation", model "BTN-1-ZHA".
 
 ## Reset button
 
