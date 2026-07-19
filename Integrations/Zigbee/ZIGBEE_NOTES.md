@@ -25,7 +25,7 @@ Action values on MultistateInput presentValue: 1 single, 2 double, 3 triple, 4 h
 
 ## Reporting behavior
 
-- Button state and action attributes use the component's force-report path: every change transmits exactly that one attribute immediately as a unicast to the coordinator. The old firmware's report-everything-on-every-press behavior is gone.
+- Button state and action attributes report through explicit per-attribute report actions in the automations, with the component's reporting engine left unregistered for them. This sends exactly one report per edge and avoids the duplicate-event window that combining engine reporting with immediate reports would open. Action reports are additionally gated on being joined, so presses before the first join cannot queue and replay as phantom events at join time.
 - Battery attributes report through the standard reporting engine. The MAX17048 is polled every 5 minutes, so expect battery updates at that cadence. Coordinators can reconfigure reporting with standard ZCL; the configuration persists in Zigbee NVRAM.
 - Component-level defaults at this pin are min interval 10 s, max interval 0, delta 0, and are not adjustable from YAML. ZHA additionally clamps some minimum intervals to 30 s.
 
@@ -46,6 +46,15 @@ A unit flashed with the previous binary (model "BTN-1", endpoints: lights 1-4, s
 - ESP Reboot button, cycleCounter global, light effects: dead over Zigbee (no transport can reach them).
 - AnalogInput battery endpoints: replaced by the standard PowerConfiguration cluster.
 
+## Removed relative to the Wi-Fi firmware, with reasons
+
+- Remote buzzer control (the api play_buzzer action): there is no Zigbee transport for arbitrary tone playback. The buzzer now serves local feedback only (join chirp). If a Zigbee path is ever wanted, a writable custom attribute could carry a tone index.
+- ESP die temperature, uptime, and the other diagnostic sensors: deliberate scope cut to keep the endpoint count at eight on a battery device; PUMP-1 demonstrates the temperature pattern if it is ever wanted here.
+
+## Local feedback and coordinator state
+
+The status LED gestures drive the physical strip directly. The tap status indicator uses only the Button 1 light so coordinator-set colors on the other three survive; the join flash uses the whole strip (lights are expected dark at join time). The component connects attributes to lights one way (Zigbee to light), so a locally driven flash is not reported back; a coordinator that had set a color sees its own state until it next reads or commands. This is a component limitation, noted for the hardware pass.
+
 ## Known limitations
 
 - No Zigbee OTA: firmware updates are USB serial only.
@@ -54,6 +63,7 @@ A unit flashed with the previous binary (model "BTN-1", endpoints: lights 1-4, s
 - The component's event queue holds 32 events; extreme bursts log a warning and drop. Four buttons mashed simultaneously stay well under this.
 - Manual force-reports go to the coordinator (address 0x0000, endpoint 1) and ignore bindings.
 - Groups and scenes clusters exist on the light endpoints via SDK defaults but are untested upstream; scenes are not implemented by the component.
+- Identify is a no-op: the component attaches an Identify cluster to every endpoint but registers no handler, so an Identify command blinks nothing. Upstream lists identify-driven light effects as planned work.
 
 ## Component pin notes and upstream issues worth filing
 

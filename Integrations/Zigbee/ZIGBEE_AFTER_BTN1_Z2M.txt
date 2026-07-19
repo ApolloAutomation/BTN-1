@@ -1,5 +1,5 @@
 BTN-1 Zigbee signature AFTER the 26.7.19.1-zigbee rework, Zigbee2MQTT variant
-(read from the generated build)
+(verified against a local build during development; regenerate by compiling and grepping create_default_cluster in the generated main.cpp)
 
 Manufacturer:    Apollo Automation
 Model:           BTN-1-Z2M

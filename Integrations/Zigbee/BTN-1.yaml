@@ -79,10 +79,11 @@ zigbee:
       clusters:
         - id: BINARY_INPUT
           attributes:
-            - attribute_id: 0x55
+            - id: btn1_state
+              attribute_id: 0x55
               type: BOOL
               value: false
-              report: force
+              report: false
               device: button_1
             - attribute_id: 0x51
               id: btn1_bi_oos
@@ -96,14 +97,14 @@ zigbee:
               id: btn1_bi_desc
               type: CHAR_STRING
               value: "Button 1"
-              max_length: 16
+              max_length: 0
         - id: MULTI_INPUT
           attributes:
             - id: btn1_action
               attribute_id: 0x55
               type: U16
               value: 0
-              report: force
+              report: false
             - attribute_id: 0x4A
               id: btn1_ms_states
               type: U16
@@ -120,7 +121,7 @@ zigbee:
               id: btn1_ms_desc
               type: CHAR_STRING
               value: "Button 1 Action"
-              max_length: 16
+              max_length: 0
         - id: POWER_CONFIG
           attributes:
             # BatteryVoltage, ZCL unit is 100 mV
@@ -129,24 +130,25 @@ zigbee:
               value: 0
               report: true
               device: batt_v
-              scale: 10
+              lambda: 'return (uint8_t) lroundf(x * 10.0f);' 
             # BatteryPercentageRemaining, ZCL unit is half percent
             - attribute_id: 0x0021
               type: U8
               value: 0
               report: true
               device: batt_pct
-              scale: 2
+              lambda: 'return (uint8_t) lroundf(x * 2.0f);' 
     # Button 2
     - device_type: CUSTOM_ATTR
       num: 2
       clusters:
         - id: BINARY_INPUT
           attributes:
-            - attribute_id: 0x55
+            - id: btn2_state
+              attribute_id: 0x55
               type: BOOL
               value: false
-              report: force
+              report: false
               device: button_2
             - attribute_id: 0x51
               id: btn2_bi_oos
@@ -160,14 +162,14 @@ zigbee:
               id: btn2_bi_desc
               type: CHAR_STRING
               value: "Button 2"
-              max_length: 16
+              max_length: 0
         - id: MULTI_INPUT
           attributes:
             - id: btn2_action
               attribute_id: 0x55
               type: U16
               value: 0
-              report: force
+              report: false
             - attribute_id: 0x4A
               id: btn2_ms_states
               type: U16
@@ -184,17 +186,18 @@ zigbee:
               id: btn2_ms_desc
               type: CHAR_STRING
               value: "Button 2 Action"
-              max_length: 16
+              max_length: 0
     # Button 3
     - device_type: CUSTOM_ATTR
       num: 3
       clusters:
         - id: BINARY_INPUT
           attributes:
-            - attribute_id: 0x55
+            - id: btn3_state
+              attribute_id: 0x55
               type: BOOL
               value: false
-              report: force
+              report: false
               device: button_3
             - attribute_id: 0x51
               id: btn3_bi_oos
@@ -208,14 +211,14 @@ zigbee:
               id: btn3_bi_desc
               type: CHAR_STRING
               value: "Button 3"
-              max_length: 16
+              max_length: 0
         - id: MULTI_INPUT
           attributes:
             - id: btn3_action
               attribute_id: 0x55
               type: U16
               value: 0
-              report: force
+              report: false
             - attribute_id: 0x4A
               id: btn3_ms_states
               type: U16
@@ -232,17 +235,18 @@ zigbee:
               id: btn3_ms_desc
               type: CHAR_STRING
               value: "Button 3 Action"
-              max_length: 16
+              max_length: 0
     # Button 4
     - device_type: CUSTOM_ATTR
       num: 4
       clusters:
         - id: BINARY_INPUT
           attributes:
-            - attribute_id: 0x55
+            - id: btn4_state
+              attribute_id: 0x55
               type: BOOL
               value: false
-              report: force
+              report: false
               device: button_4
             - attribute_id: 0x51
               id: btn4_bi_oos
@@ -256,14 +260,14 @@ zigbee:
               id: btn4_bi_desc
               type: CHAR_STRING
               value: "Button 4"
-              max_length: 16
+              max_length: 0
         - id: MULTI_INPUT
           attributes:
             - id: btn4_action
               attribute_id: 0x55
               type: U16
               value: 0
-              report: force
+              report: false
             - attribute_id: 0x4A
               id: btn4_ms_states
               type: U16
@@ -280,7 +284,7 @@ zigbee:
               id: btn4_ms_desc
               type: CHAR_STRING
               value: "Button 4 Action"
-              max_length: 16
+              max_length: 0
     # BTN 1 Light
     - device_type: COLOR_DIMMABLE_LIGHT
       num: 5
