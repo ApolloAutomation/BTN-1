@@ -6,7 +6,7 @@ Covers both Zigbee branches. Firmware version 26.7.19.1-zigbee, built with ESPHo
 
 | Branch | Model on the air | Integration glue |
 | --- | --- | --- |
-| `z2m` | BTN-1-Z2M | apollo_btn1.js external converter |
+| `z2m` | BTN-1-Z2M | apollo_btn1.mjs external converter |
 | `ZHA` | BTN-1-ZHA | apollo_btn1_quirk.py custom quirk |
 
 The firmware is otherwise identical (see BRANCH_PARITY.md). Both are Zigbee end devices, mains-or-battery powered, radio always on.
