@@ -1,0 +1,23 @@
+BTN-1 Zigbee signature BEFORE the 26.7.19.1-zigbee rework
+(read from firmware at commit e32f6f6, verified against the generated build)
+
+Manufacturer:    Apollo Automation
+Model:           BTN-1
+ApplicationVersion 0, DateCode = build date, PowerSource 0 (unknown)
+Role: end device (YAML claimed router; the component overrode it)
+
+EP  1  COLOR_DIMMABLE_LIGHT  Basic, Identify, Groups, Scenes, OnOff, LevelControl, ColorControl(XY)  BTN 1 Light
+EP  2  COLOR_DIMMABLE_LIGHT  same                                                                    BTN 2 Light
+EP  3  COLOR_DIMMABLE_LIGHT  same                                                                    BTN 3 Light
+EP  4  COLOR_DIMMABLE_LIGHT  same                                                                    BTN 4 Light
+EP  5  ON_OFF_OUTPUT         Basic, Identify, OnOff                                                  Prevent Sleep
+EP  6  CUSTOM_ATTR           Basic, Identify, AnalogInput (presentValue float, BACnet volts)         Battery Voltage
+EP  7  CUSTOM_ATTR           Basic, Identify, AnalogInput (presentValue float, BACnet percent)       Battery Level
+EP  8  CUSTOM_ATTR           Basic, Identify, BinaryInput (presentValue bool)                        Button 1
+EP  9  CUSTOM_ATTR           same                                                                    Button 2
+EP 10  CUSTOM_ATTR           same                                                                    Button 3
+EP 11  CUSTOM_ATTR           same                                                                    Button 4
+
+No battery cluster. No click events. zigbee.report sent every attribute on
+every press and release. Sleep Duration number and ESP Reboot button had
+no endpoints.
