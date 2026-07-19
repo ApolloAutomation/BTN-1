@@ -1,39 +1,38 @@
 # Apollo Automation BTN-1 Hardware Configuration for Zigbee
-# This file contains all hardware definitions compatible with Zigbee
 #
-# Key differences from WiFi version:
-# - No WiFi, API, captive_portal, or web_server
-# - Button binary_sensors are NOT internal (for Zigbee discovery)
-# - Event entities removed (not supported by Zigbee auto-discovery)
-# - Power switches are internal
-# - internal_temperature and uptime sensors removed
+# Hardware definitions shared by the BTN-1 Zigbee variants. The Zigbee
+# endpoint layout lives in BTN-1.yaml; this file provides the entities the
+# endpoints connect to, plus local feedback (LEDs, buzzer) and the reset
+# button behavior.
 #
-# NOTE: When including this as a package, you MUST also include
-# the MAX17048 external component in your main config:
-#   external_components:
-#     - source: github://ApolloAutomation/esphome-battery-component
-#       components: [max17048]
+# Differences from the Wi-Fi Core.yaml, on purpose:
+# - No wifi, api, ota, web_server, captive_portal, or version sensors.
+# - No deep sleep: this firmware runs as a non-sleepy Zigbee end device.
+#   The component in use has no sleepy end device support, so a sleeping
+#   device would fall off the network and lose button presses. USB-C power
+#   is the intended mode; on battery the always-on radio drains in days,
+#   which the docs state plainly.
+# - Button click, double click, triple click, and hold detection runs
+#   on-device with the same timing windows as the Wi-Fi firmware, and is
+#   published over Zigbee as MultistateInput action values.
+# - Raw press and release state is published from the BinaryInput
+#   attributes wired in BTN-1.yaml; no automation is needed here for that.
+#
+# Reset button (GPIO9) hold tiers:
+# - Tap (under 1 second): status LED. Blue means joined to a Zigbee
+#   network, yellow means not joined.
+# - Hold 5 to 10 seconds, then release: Zigbee reset. Leaves the network,
+#   erases Zigbee network data, reboots into pairing mode.
+# - Hold 10 seconds (fires while still held): full factory reset. Erases
+#   ESPHome preferences and Zigbee network data, then reboots.
 
 substitutions:
   name: apollo-btn-1-zb
-  version: "25.10.10.2-zigbee"
-  device_description: ${name} Zigbee - Apollo Automation BTN-1 Zigbee version ${version}
+  version: "26.7.19.1-zigbee"
+  device_description: Apollo Automation BTN-1 Zigbee firmware ${version}
 
 # ============================================
-# Globals
-# ============================================
-globals:
-  - id: cycleCounter
-    type: int
-    restore_value: no
-    initial_value: '0'
-  - id: button_press_timestamp
-    restore_value: no
-    type: uint32_t
-    initial_value: '0'
-
-# ============================================
-# I2C Bus Configuration
+# I2C Bus (MAX17048 fuel gauge)
 # ============================================
 i2c:
   id: i2c_bus
@@ -41,7 +40,7 @@ i2c:
   scl: GPIO0
 
 # ============================================
-# Buzzer Output (LEDC)
+# Buzzer (LEDC + RTTTL)
 # ============================================
 output:
   - platform: ledc
@@ -53,56 +52,10 @@ rtttl:
   output: buzzer
 
 # ============================================
-# Deep Sleep Configuration
-# ============================================
-deep_sleep:
-  id: deep_sleep_1
-  sleep_duration: 24h
-  run_duration: 90s
-  esp32_ext1_wakeup:
-    mode: ANY_HIGH
-    pins:
-      - number: GPIO2
-        allow_other_uses: true
-      - number: GPIO4
-        allow_other_uses: true
-      - number: GPIO5
-        allow_other_uses: true
-      - number: GPIO6
-        allow_other_uses: true
-
-# ============================================
-# Sleep Duration Configuration
-# ============================================
-number:
-  - platform: template
-    name: "Sleep Duration"
-    id: deep_sleep_sleep_duration
-    min_value: 0
-    max_value: 800
-    step: 1
-    mode: box
-    update_interval: never
-    optimistic: true
-    restore_value: true
-    initial_value: 24
-    icon: "mdi:arrow-collapse-right"
-    entity_category: CONFIG
-    unit_of_measurement: "h"
-    on_value:
-      then:
-        - lambda: |-
-            id(deep_sleep_1).set_sleep_duration(x * 60 * 60 * 1000);
-
-# ============================================
-# Button Binary Sensors
-# Note: NOT internal - exposed for Zigbee discovery
+# Buttons
 # ============================================
 binary_sensor:
-  # Reset Button (GPIO9)
-  # Hold 3-5s: Prevent sleep
-  # Hold 5-10s: Reset Zigbee (enter pairing mode)
-  # Hold 10s+: Factory reset
+  # Reset Button (GPIO9). See the tier table in the header comment.
   - platform: gpio
     pin:
       number: GPIO9
@@ -112,135 +65,225 @@ binary_sensor:
         pullup: true
       ignore_strapping_warning: true
     id: reset_button
-    name: "Reset Button"
     internal: true
-    on_press:
-      then:
-        - logger.log:
-            level: INFO
-            format: "Reset button pressed - hold 5-10s to reset Zigbee"
-        - lambda: |-
-            id(button_press_timestamp) = millis();
-    on_release:
-      then:
-        - lambda: |-
-            uint32_t hold_time = millis() - id(button_press_timestamp);
-            ESP_LOGI("button", "Reset button released after %d ms", hold_time);
-            
-            if (hold_time >= 10000) {
-              // 10+ seconds: Factory reset
-              ESP_LOGI("button", "Factory reset triggered!");
-              id(prevent_sleep).turn_on();
-              id(factory_reset_switch).turn_on();
-            }
-            else if (hold_time >= 3000) {
-              // 3-5 seconds: Prevent sleep
-              ESP_LOGI("button", "Prevent sleep activated");
-              id(prevent_sleep).turn_on();
-              id(deep_sleep_1).prevent_deep_sleep();
-            }
-    # CRITICAL: 5-10 second hold triggers Zigbee reset (pairing mode)
-    on_click:
-      min_length: 5s
-      max_length: 10s
-      then:
-        - logger.log:
-            level: INFO
-            format: "*** ZIGBEE RESET - Entering pairing mode ***"
-        - zigbee.reset: zb
+    on_multi_click:
+      # Tap: show join status on the LEDs
+      - timing:
+          - ON for at most 1s
+          - OFF for at least 0.2s
+        then:
+          - script.execute: status_check
+      # 5-10 s hold, released: Zigbee reset, enter pairing mode
+      - timing:
+          - ON for 5s to 10s
+          - OFF for at least 0.2s
+        then:
+          - logger.log:
+              level: INFO
+              format: "Zigbee reset, entering pairing mode"
+          - zigbee.reset: zb
+      # 10 s hold: full factory reset (ESPHome preferences + Zigbee network
+      # data). zigbee.reset erases Zigbee NVRAM and reboots, so the
+      # preference wipe must happen first, in the same automation.
+      - timing:
+          - ON for at least 10s
+        then:
+          - logger.log:
+              level: INFO
+              format: "Factory reset: erasing ESPHome preferences and Zigbee network data"
+          - lambda: |-
+              global_preferences->reset();
+          - zigbee.reset: zb
 
-  # Button 1 (GPIO2) - Exposed for Zigbee
-  # CRITICAL: on_press/on_release with zigbee.report required for ZHA to receive button states
+  # Button 1 (GPIO2). Raw state flows through the BinaryInput attribute
+  # wired in BTN-1.yaml. The blocks below add click semantics with the
+  # same timing windows as the Wi-Fi firmware.
   - platform: gpio
     id: button_1
     name: "Button 1"
     pin:
       number: GPIO2
-      allow_other_uses: true
       mode:
         input: true
         pulldown: true
-    on_press:
-      then:
-        - logger.log:
-            level: INFO
-            format: "Button 1 PRESSED - sending Zigbee report"
-        - zigbee.report: zb
-    on_release:
-      then:
-        - logger.log:
-            level: INFO
-            format: "Button 1 RELEASED - sending Zigbee report"
-        - zigbee.report: zb
+    filters:
+      - delayed_off: 10ms
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn1_action
+              value: 1
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+          - zigbee.setAttr:
+              id: btn1_action
+              value: 2
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn1_action
+              value: 3
+      - timing:
+          - ON for 1s to 5s
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn1_action
+              value: 4
 
-  # Button 2 (GPIO4) - Exposed for Zigbee
+  # Button 2 (GPIO4)
   - platform: gpio
     id: button_2
     name: "Button 2"
     pin:
       number: GPIO4
-      allow_other_uses: true
       mode:
         input: true
         pulldown: true
-    on_press:
-      then:
-        - logger.log:
-            level: INFO
-            format: "Button 2 PRESSED - sending Zigbee report"
-        - zigbee.report: zb
-    on_release:
-      then:
-        - logger.log:
-            level: INFO
-            format: "Button 2 RELEASED - sending Zigbee report"
-        - zigbee.report: zb
+    filters:
+      - delayed_off: 10ms
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn2_action
+              value: 1
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+          - zigbee.setAttr:
+              id: btn2_action
+              value: 2
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn2_action
+              value: 3
+      - timing:
+          - ON for 1s to 5s
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn2_action
+              value: 4
 
-  # Button 3 (GPIO6) - Exposed for Zigbee
+  # Button 3 (GPIO6)
   - platform: gpio
     id: button_3
     name: "Button 3"
     pin:
       number: GPIO6
-      allow_other_uses: true
       mode:
         input: true
         pulldown: true
-    on_press:
-      then:
-        - logger.log:
-            level: INFO
-            format: "Button 3 PRESSED - sending Zigbee report"
-        - zigbee.report: zb
-    on_release:
-      then:
-        - logger.log:
-            level: INFO
-            format: "Button 3 RELEASED - sending Zigbee report"
-        - zigbee.report: zb
+    filters:
+      - delayed_off: 10ms
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn3_action
+              value: 1
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+          - zigbee.setAttr:
+              id: btn3_action
+              value: 2
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn3_action
+              value: 3
+      - timing:
+          - ON for 1s to 5s
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn3_action
+              value: 4
 
-  # Button 4 (GPIO5) - Exposed for Zigbee
+  # Button 4 (GPIO5)
   - platform: gpio
     id: button_4
     name: "Button 4"
     pin:
       number: GPIO5
-      allow_other_uses: true
       mode:
         input: true
         pulldown: true
-    on_press:
-      then:
-        - logger.log:
-            level: INFO
-            format: "Button 4 PRESSED - sending Zigbee report"
-        - zigbee.report: zb
-    on_release:
-      then:
-        - logger.log:
-            level: INFO
-            format: "Button 4 RELEASED - sending Zigbee report"
-        - zigbee.report: zb
+    filters:
+      - delayed_off: 10ms
+    on_multi_click:
+      - timing:
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn4_action
+              value: 1
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.2s
+        then:
+          - zigbee.setAttr:
+              id: btn4_action
+              value: 2
+      - timing:
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at most 0.5s
+          - ON for at most 300ms
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn4_action
+              value: 3
+      - timing:
+          - ON for 1s to 5s
+          - OFF for at least 0.5s
+        then:
+          - zigbee.setAttr:
+              id: btn4_action
+              value: 4
 
 # ============================================
 # Battery Monitoring (MAX17048)
@@ -248,44 +291,24 @@ binary_sensor:
 sensor:
   - platform: max17048
     id: max_17048
+    update_interval: 300s
     battery_voltage:
-      name: "Battery Voltage"
+      name: "Battery voltage"
       id: batt_v
     battery_level:
-      name: "Battery Level"
+      name: "Battery level"
       id: batt_pct
       filters:
-        - lambda: |
-            if (x > 100) return 100;
-            else return (x);
+        - lambda: |-
+            if (isnan(x)) return {};
+            if (x > 100.0f) return 100.0f;
+            if (x < 0.0f) return 0.0f;
+            return x;
 
 # ============================================
-# Switches
+# Power rails (hardware control, always on)
 # ============================================
 switch:
-  # Prevent Sleep (User-accessible)
-  - platform: template
-    name: "Prevent Sleep"
-    id: prevent_sleep
-    icon: mdi:sleep
-    restore_mode: RESTORE_DEFAULT_ON
-    optimistic: true
-    entity_category: "config"
-    on_turn_on:
-      then:
-        - lambda: |-
-            id(deep_sleep_1).prevent_deep_sleep();
-    on_turn_off:
-      then:
-        - lambda: |-
-            id(deep_sleep_1).allow_deep_sleep();
-
-  # Factory Reset (Internal)
-  - platform: factory_reset
-    id: factory_reset_switch
-    disabled_by_default: true
-
-  # Power Latch (Internal - hardware control)
   - platform: gpio
     pin: GPIO19
     name: "Power Latch"
@@ -294,7 +317,6 @@ switch:
     setup_priority: 2000
     internal: true
 
-  # Accessory Power (Internal - hardware control)
   - platform: gpio
     pin: GPIO18
     name: "Accessory Power"
@@ -307,7 +329,7 @@ switch:
 # RGB LEDs (WS2812 on GPIO21)
 # ============================================
 light:
-  # Main RGB Strip (internal, used by partitions)
+  # Full strip (internal, used by the partitions and local feedback)
   - platform: esp32_rmt_led_strip
     id: rgb_light
     name: "RGB Light"
@@ -317,21 +339,8 @@ light:
     num_leds: 4
     rgb_order: grb
     internal: true
-    effects:
-      - pulse:
-          name: "Slow Pulse"
-          transition_length: 1000ms
-          update_interval: 1000ms
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Fast Blink"
-          transition_length: 100ms
-          update_interval: 100ms
-          min_brightness: 50%
-          max_brightness: 100%
 
-  # BTN 1 Light (LED 0)
+  # Per-button lights, exposed over Zigbee as endpoints 5-8
   - platform: partition
     name: "BTN 1 Light"
     id: btn_1_light
@@ -340,21 +349,7 @@ light:
       - id: rgb_light
         from: 0
         to: 0
-    effects:
-      - pulse:
-          name: "Slow Pulse"
-          transition_length: 1000ms
-          update_interval: 1000ms
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Fast Blink"
-          transition_length: 100ms
-          update_interval: 100ms
-          min_brightness: 50%
-          max_brightness: 100%
 
-  # BTN 2 Light (LED 1)
   - platform: partition
     name: "BTN 2 Light"
     id: btn_2_light
@@ -363,21 +358,7 @@ light:
       - id: rgb_light
         from: 1
         to: 1
-    effects:
-      - pulse:
-          name: "Slow Pulse"
-          transition_length: 1000ms
-          update_interval: 1000ms
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Fast Blink"
-          transition_length: 100ms
-          update_interval: 100ms
-          min_brightness: 50%
-          max_brightness: 100%
 
-  # BTN 3 Light (LED 2)
   - platform: partition
     name: "BTN 3 Light"
     id: btn_3_light
@@ -386,21 +367,7 @@ light:
       - id: rgb_light
         from: 2
         to: 2
-    effects:
-      - pulse:
-          name: "Slow Pulse"
-          transition_length: 1000ms
-          update_interval: 1000ms
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Fast Blink"
-          transition_length: 100ms
-          update_interval: 100ms
-          min_brightness: 50%
-          max_brightness: 100%
 
-  # BTN 4 Light (LED 3)
   - platform: partition
     name: "BTN 4 Light"
     id: btn_4_light
@@ -409,24 +376,45 @@ light:
       - id: rgb_light
         from: 3
         to: 3
-    effects:
-      - pulse:
-          name: "Slow Pulse"
-          transition_length: 1000ms
-          update_interval: 1000ms
-          min_brightness: 0%
-          max_brightness: 100%
-      - pulse:
-          name: "Fast Blink"
-          transition_length: 100ms
-          update_interval: 100ms
-          min_brightness: 50%
-          max_brightness: 100%
 
 # ============================================
-# Restart Button
+# Local feedback scripts
 # ============================================
-button:
-  - platform: restart
-    icon: mdi:power-cycle
-    name: "ESP Reboot"
+script:
+  # Green flash and a short chirp when the device joins a Zigbee network
+  - id: join_feedback
+    mode: restart
+    then:
+      - light.turn_on:
+          id: rgb_light
+          red: 0%
+          green: 100%
+          blue: 0%
+          brightness: 60%
+      - rtttl.play: "joined:d=16,o=6,b=140:c,e,g"
+      - delay: 2s
+      - light.turn_off: rgb_light
+
+  # Join status on tap of the reset button: blue joined, yellow not joined
+  - id: status_check
+    mode: restart
+    then:
+      - if:
+          condition:
+            lambda: 'return id(zb).is_connected();'
+          then:
+            - light.turn_on:
+                id: rgb_light
+                red: 0%
+                green: 0%
+                blue: 100%
+                brightness: 60%
+          else:
+            - light.turn_on:
+                id: rgb_light
+                red: 100%
+                green: 100%
+                blue: 0%
+                brightness: 60%
+      - delay: 3s
+      - light.turn_off: rgb_light
