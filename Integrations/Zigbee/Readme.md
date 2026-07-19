@@ -4,7 +4,11 @@ This directory contains the ESPHome Zigbee configuration for the Apollo BTN-1 wi
 
 ## Overview
 
-The BTN-1 is a 4-button wireless remote powered by an ESP32-C6 with native Zigbee support. This configuration allows the BTN-1 to pair with Home Assistant via ZHA (Zigbee Home Automation) integration.
+The BTN-1 is a 4-button wireless remote powered by an ESP32-C6 with native Zigbee support. This configuration allows the BTN-1 to pair with Home Assistant via ZHA (Zigbee Home Automation) or Zigbee2MQTT.
+
+**Coordinator Compatibility:**
+- **ZHA**: Works out of the box with auto-discovery
+- **Zigbee2MQTT**: Requires external converter (`apollo_btn1.js` included in this directory)
 
 ## Hardware Specifications
 
@@ -37,15 +41,15 @@ The BTN-1 is a 4-button wireless remote powered by an ESP32-C6 with native Zigbe
 ## Files
 
 ```
-ESPHome_Zigbee/
-├── README.md                         # This file
-├── PAIRING_GUIDE.md                  # ZHA pairing instructions
-├── Core_Hardware_Zigbee.yaml         # Hardware definitions (package)
-├── partitions/
-│   └── partitions_zb.csv             # Zigbee partition table
-└── examples/
-    ├── btn1_zigbee_simple.yaml       # Basic config using packages
-    └── btn1_zigbee_simple_FIXED.yaml # Complete standalone config
+Zigbee/
+├── Readme.md                  # This file
+├── PAIRING_GUIDE.md           # ZHA & Zigbee2MQTT pairing instructions
+├── BTN-1.yaml                 # Main Zigbee firmware config
+├── Core.yaml                  # Hardware definitions (package)
+├── partitions_zb.csv          # Zigbee partition table
+├── apollo_btn1.js             # Zigbee2MQTT external converter
+└── releases/
+    └── apollo-btn-1-zigbee.bin  # Pre-compiled firmware binary
 ```
 
 ## Quick Start

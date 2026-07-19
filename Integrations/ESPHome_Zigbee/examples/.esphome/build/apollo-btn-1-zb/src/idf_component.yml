@@ -1,0 +1,5 @@
+dependencies:
+  espressif/esp-zboss-lib:
+    version: 1.6.4
+  espressif/esp-zigbee-lib:
+    version: 1.6.7

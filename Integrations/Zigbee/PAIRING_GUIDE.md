@@ -1,15 +1,17 @@
-# Apollo BTN-1 ZHA Pairing Guide
+# Apollo BTN-1 Zigbee Pairing Guide
 
-This guide walks you through pairing your Apollo BTN-1 Zigbee device with Home Assistant using the ZHA (Zigbee Home Automation) integration.
+This guide walks you through pairing your Apollo BTN-1 Zigbee device with Home Assistant using either ZHA (Zigbee Home Automation) or Zigbee2MQTT.
 
 ## Prerequisites
 
 Before you begin, ensure you have:
 
 - [ ] Home Assistant installed and running
-- [ ] ZHA integration configured with a compatible Zigbee coordinator
-- [ ] BTN-1 flashed with Zigbee firmware (`btn1_zigbee_simple_FIXED.yaml`)
+- [ ] ZHA or Zigbee2MQTT configured with a compatible Zigbee coordinator
+- [ ] BTN-1 flashed with Zigbee firmware
 - [ ] BTN-1 charged or connected to power
+
+**Note:** ZHA works out of the box. Zigbee2MQTT requires the external converter (`apollo_btn1.js`) included in this directory.
 
 ## Supported Coordinators
 
@@ -87,7 +89,72 @@ After pairing, the following entities should appear:
 | `light.apollo_btn_1_zb_btn_3_light` | Light | Button 3 LED |
 | `light.apollo_btn_1_zb_btn_4_light` | Light | Button 4 LED |
 
-## Creating Automations
+---
+
+## Zigbee2MQTT Setup
+
+Zigbee2MQTT requires an external converter to recognize the BTN-1. Follow these steps:
+
+### Step 1: Install the External Converter
+
+1. Copy `apollo_btn1.js` to your Zigbee2MQTT external_converters directory:
+   - Home Assistant Add-on: `/config/zigbee2mqtt/`
+   - Docker: Mount your converters directory
+   - Native: Typically `~/zigbee2mqtt/data/`
+
+2. Add to your Zigbee2MQTT `configuration.yaml`:
+   ```yaml
+   external_converters:
+     - apollo_btn1.js
+   ```
+
+3. Restart Zigbee2MQTT
+
+### Step 2: Pair the Device
+
+1. Enable permit join in Zigbee2MQTT
+2. Put BTN-1 in pairing mode (hold reset button 5-10 seconds)
+3. Device should appear as "Apollo BTN-1"
+
+### Step 3: Verify Endpoints
+
+If entities don't appear correctly after pairing:
+
+1. Go to Z2M Frontend → Device → "Dev console" tab
+2. Click "Read" on various endpoints to see cluster data
+3. Note the actual endpoint numbers
+4. Adjust the `endpoint()` function in `apollo_btn1.js` if needed
+
+### Zigbee2MQTT Entities
+
+After pairing with the converter, you should see:
+
+| Entity | Type | Description |
+|--------|------|-------------|
+| `action` | Sensor | Button events (button_1_press, etc.) |
+| `battery` | Sensor | Battery percentage |
+| `battery_voltage` | Sensor | Battery voltage |
+| `light_btn_1_light` | Light | Button 1 RGB LED |
+| `light_btn_2_light` | Light | Button 2 RGB LED |
+| `light_btn_3_light` | Light | Button 3 RGB LED |
+| `light_btn_4_light` | Light | Button 4 RGB LED |
+| `switch_prevent_sleep` | Switch | Prevent deep sleep |
+
+### Troubleshooting Z2M
+
+**Device shows as "Unsupported":**
+- Ensure `apollo_btn1.js` is in the correct directory
+- Check Z2M logs for converter loading errors
+- Restart Z2M after adding the converter
+
+**Endpoint mapping incorrect:**
+- Use Z2M Dev Console to inspect actual endpoints
+- Edit the `endpoint()` function in the converter
+- Remove and re-pair the device after changes
+
+---
+
+## Creating Automations (ZHA)
 
 Since the BTN-1 exposes binary sensors for button states, you can create automations in Home Assistant to handle button presses.
 

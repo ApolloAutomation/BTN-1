@@ -1,0 +1,2229 @@
+{
+	"archive" : {},
+	"artifacts" : 
+	[
+		{
+			"path" : "esp-idf/src/libsrc.a"
+		}
+	],
+	"backtrace" : 2,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"idf_component_register",
+			"set_property",
+			"__component_set_dependencies",
+			"__component_set_all_dependencies",
+			"add_compile_options",
+			"add_c_compile_options",
+			"add_compile_definitions",
+			"include_directories",
+			"add_cxx_compile_options"
+		],
+		"files" : 
+		[
+			"/Users/justinapollo/.platformio/packages/framework-espidf/tools/cmake/component.cmake",
+			"src/CMakeLists.txt",
+			"/Users/justinapollo/.platformio/packages/framework-espidf/tools/cmake/utilities.cmake"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 6,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 491,
+				"parent" : 1
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 524,
+				"parent" : 1
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 362,
+				"parent" : 3
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 341,
+				"parent" : 4
+			},
+			{
+				"command" : 5,
+				"file" : 0,
+				"line" : 476,
+				"parent" : 1
+			},
+			{
+				"command" : 6,
+				"file" : 0,
+				"line" : 478,
+				"parent" : 1
+			},
+			{
+				"command" : 5,
+				"file" : 2,
+				"line" : 281,
+				"parent" : 7
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 341,
+				"parent" : 4
+			},
+			{
+				"command" : 7,
+				"file" : 0,
+				"line" : 477,
+				"parent" : 1
+			},
+			{
+				"command" : 8,
+				"file" : 0,
+				"line" : 475,
+				"parent" : 1
+			},
+			{
+				"command" : 9,
+				"file" : 0,
+				"line" : 479,
+				"parent" : 1
+			},
+			{
+				"command" : 5,
+				"file" : 2,
+				"line" : 270,
+				"parent" : 12
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-march=rv32imac_zicsr_zifencei  -fdiagnostics-color=always"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-ffunction-sections"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fdata-sections"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-error=unused-function"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-error=unused-variable"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-error=unused-but-set-variable"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-error=deprecated-declarations"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-error=extra"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-unused-parameter"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-sign-compare"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-enum-conversion"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-gdwarf-4"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-ggdb"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-nostartfiles"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Os"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-freorder-blocks"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fmacro-prefix-map=/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/ESPHome_Zigbee/examples/.esphome/build/apollo-btn-1-zb=."
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fmacro-prefix-map=/Users/justinapollo/.platformio/packages/framework-espidf=/IDF"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fstrict-volatile-bitfields"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fno-jump-tables"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fno-tree-switch-conversion"
+				},
+				{
+					"backtrace" : 13,
+					"fragment" : "-std=gnu++2b"
+				},
+				{
+					"backtrace" : 13,
+					"fragment" : "-fno-exceptions"
+				},
+				{
+					"backtrace" : 13,
+					"fragment" : "-fno-rtti"
+				},
+				{
+					"backtrace" : 13,
+					"fragment" : "-fuse-cxa-atexit"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 10,
+					"define" : "ESP_PLATFORM"
+				},
+				{
+					"backtrace" : 10,
+					"define" : "IDF_VER=\"5.5.1\""
+				},
+				{
+					"backtrace" : 2,
+					"define" : "SOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "SOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ"
+				},
+				{
+					"backtrace" : 10,
+					"define" : "_GLIBCXX_HAVE_POSIX_SEMAPHORE"
+				},
+				{
+					"backtrace" : 10,
+					"define" : "_GLIBCXX_USE_POSIX_SEMAPHORE"
+				},
+				{
+					"backtrace" : 10,
+					"define" : "_GNU_SOURCE"
+				},
+				{
+					"backtrace" : 10,
+					"define" : "_POSIX_READER_WRITER_LOCKS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 11,
+					"path" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/ESPHome_Zigbee/examples/.esphome/build/apollo-btn-1-zb/.pioenvs/apollo-btn-1-zb/config"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/newlib/platform_include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/config/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/config/include/freertos"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/config/riscv/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/FreeRTOS-Kernel/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/FreeRTOS-Kernel/portable/riscv/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/esp_additions/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/include/soc"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/include/soc/esp32c6"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/dma/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/ldo/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/debug_probe/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/mspi_timing_tuning/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/mspi_timing_tuning/tuning_scheme_impl/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/power_supply/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/port/esp32c6/."
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/port/esp32c6/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/port/esp32c6/private_include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/heap/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/heap/tlsf"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/log/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/soc/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/soc/esp32c6"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/soc/esp32c6/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/soc/esp32c6/register"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/hal/platform_port/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/hal/esp32c6/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/hal/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_rom/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_rom/esp32c6/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_rom/esp32c6/include/esp32c6"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_rom/esp32c6"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_common/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_system/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_system/port/soc"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_system/port/include/riscv"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_system/port/include/private"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/riscv/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/include/apps"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/include/apps/sntp"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/lwip/src/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/port/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/port/freertos/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/port/esp32xx/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/port/esp32xx/include/arch"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/port/esp32xx/include/sys"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/ESPHome_Zigbee/examples/.esphome/build/apollo-btn-1-zb/managed_components/espressif__esp-zboss-lib/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/ESPHome_Zigbee/examples/.esphome/build/apollo-btn-1-zb/managed_components/espressif__esp-zigbee-lib/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/driver/deprecated"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/driver/i2c/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/driver/touch_sensor/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/driver/twai/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_pm/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_ringbuf/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_gpio/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_pcnt/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_gptimer/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_spi/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_mcpwm/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_ana_cmpr/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_i2s/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_sdmmc/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/sdmmc/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_sdspi/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_sdio/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_dac/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_rmt/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_tsens/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_sdm/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_i2c/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_uart/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/vfs/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_ledc/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_parlio/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_usb_serial_jtag/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_twai/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/ieee802154/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_coex/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_netif/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_event/include"
+				}
+			],
+			"language" : "CXX",
+			"sourceIndexes" : 
+			[
+				2,
+				4,
+				6,
+				9,
+				11,
+				13,
+				14,
+				15,
+				17,
+				18,
+				20,
+				22,
+				25,
+				27,
+				29,
+				33,
+				36,
+				38,
+				42,
+				46,
+				49,
+				51,
+				53,
+				56,
+				58,
+				60,
+				62,
+				67,
+				69,
+				70,
+				72,
+				74,
+				76,
+				78,
+				80,
+				82,
+				85,
+				87,
+				90,
+				92,
+				94,
+				96,
+				98,
+				100,
+				102,
+				104,
+				106,
+				108,
+				110,
+				112,
+				116,
+				121,
+				123,
+				125,
+				128,
+				134,
+				141,
+				144,
+				150,
+				152,
+				156,
+				158,
+				162
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-march=rv32imac_zicsr_zifencei  -fdiagnostics-color=always"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-ffunction-sections"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fdata-sections"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-error=unused-function"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-error=unused-variable"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-error=unused-but-set-variable"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-error=deprecated-declarations"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-error=extra"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-unused-parameter"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-sign-compare"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Wno-enum-conversion"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-gdwarf-4"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-ggdb"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-nostartfiles"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-Os"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-freorder-blocks"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fmacro-prefix-map=/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/ESPHome_Zigbee/examples/.esphome/build/apollo-btn-1-zb=."
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fmacro-prefix-map=/Users/justinapollo/.platformio/packages/framework-espidf=/IDF"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fstrict-volatile-bitfields"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fno-jump-tables"
+				},
+				{
+					"backtrace" : 6,
+					"fragment" : "-fno-tree-switch-conversion"
+				},
+				{
+					"backtrace" : 8,
+					"fragment" : "-std=gnu17"
+				},
+				{
+					"backtrace" : 8,
+					"fragment" : "-Wno-old-style-declaration"
+				},
+				{
+					"backtrace" : 9,
+					"fragment" : "-Wno-strict-prototypes"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 10,
+					"define" : "ESP_PLATFORM"
+				},
+				{
+					"backtrace" : 10,
+					"define" : "IDF_VER=\"5.5.1\""
+				},
+				{
+					"backtrace" : 2,
+					"define" : "SOC_MMU_PAGE_SIZE=CONFIG_MMU_PAGE_SIZE"
+				},
+				{
+					"backtrace" : 2,
+					"define" : "SOC_XTAL_FREQ_MHZ=CONFIG_XTAL_FREQ"
+				},
+				{
+					"backtrace" : 10,
+					"define" : "_GLIBCXX_HAVE_POSIX_SEMAPHORE"
+				},
+				{
+					"backtrace" : 10,
+					"define" : "_GLIBCXX_USE_POSIX_SEMAPHORE"
+				},
+				{
+					"backtrace" : 10,
+					"define" : "_GNU_SOURCE"
+				},
+				{
+					"backtrace" : 10,
+					"define" : "_POSIX_READER_WRITER_LOCKS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 11,
+					"path" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/ESPHome_Zigbee/examples/.esphome/build/apollo-btn-1-zb/.pioenvs/apollo-btn-1-zb/config"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/newlib/platform_include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/config/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/config/include/freertos"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/config/riscv/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/FreeRTOS-Kernel/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/FreeRTOS-Kernel/portable/riscv/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/FreeRTOS-Kernel/portable/riscv/include/freertos"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/freertos/esp_additions/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/include/soc"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/include/soc/esp32c6"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/dma/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/ldo/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/debug_probe/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/mspi_timing_tuning/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/mspi_timing_tuning/tuning_scheme_impl/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/power_supply/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/port/esp32c6/."
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/port/esp32c6/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_hw_support/port/esp32c6/private_include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/heap/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/heap/tlsf"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/log/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/soc/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/soc/esp32c6"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/soc/esp32c6/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/soc/esp32c6/register"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/hal/platform_port/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/hal/esp32c6/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/hal/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_rom/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_rom/esp32c6/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_rom/esp32c6/include/esp32c6"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_rom/esp32c6"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_common/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_system/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_system/port/soc"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_system/port/include/riscv"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_system/port/include/private"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/riscv/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/include/apps"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/include/apps/sntp"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/lwip/src/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/port/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/port/freertos/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/port/esp32xx/include"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/port/esp32xx/include/arch"
+				},
+				{
+					"backtrace" : 2,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/lwip/port/esp32xx/include/sys"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/ESPHome_Zigbee/examples/.esphome/build/apollo-btn-1-zb/managed_components/espressif__esp-zboss-lib/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/Code/ApolloAutomation/BTN-1/Integrations/ESPHome_Zigbee/examples/.esphome/build/apollo-btn-1-zb/managed_components/espressif__esp-zigbee-lib/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/driver/deprecated"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/driver/i2c/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/driver/touch_sensor/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/driver/twai/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_pm/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_ringbuf/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_gpio/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_pcnt/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_gptimer/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_spi/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_mcpwm/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_ana_cmpr/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_i2s/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_sdmmc/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/sdmmc/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_sdspi/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_sdio/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_dac/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_rmt/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_tsens/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_sdm/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_i2c/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_uart/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/vfs/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_ledc/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_parlio/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_usb_serial_jtag/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_driver_twai/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/ieee802154/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_coex/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_netif/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_event/include"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				114
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "__idf_riscv::@5eeb1a2ca709d020776e"
+		},
+		{
+			"backtrace" : 5,
+			"id" : "__idf_ieee802154::@4f032233b439602167f9"
+		}
+	],
+	"id" : "__idf_src::@2478b13de56d3028f688",
+	"name" : "__idf_src",
+	"nameOnDisk" : "libsrc.a",
+	"paths" : 
+	{
+		"build" : "esp-idf/src",
+		"source" : "src"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0,
+				161
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				1,
+				3,
+				5,
+				7,
+				8,
+				10,
+				12,
+				16,
+				19,
+				21,
+				23,
+				24,
+				26,
+				28,
+				30,
+				31,
+				32,
+				34,
+				35,
+				37,
+				39,
+				40,
+				41,
+				43,
+				44,
+				45,
+				47,
+				48,
+				50,
+				52,
+				54,
+				55,
+				57,
+				59,
+				61,
+				63,
+				64,
+				65,
+				66,
+				68,
+				71,
+				73,
+				75,
+				77,
+				79,
+				81,
+				83,
+				84,
+				86,
+				88,
+				89,
+				91,
+				93,
+				95,
+				97,
+				99,
+				101,
+				103,
+				105,
+				107,
+				109,
+				111,
+				113,
+				115,
+				117,
+				118,
+				119,
+				120,
+				122,
+				124,
+				126,
+				127,
+				129,
+				130,
+				131,
+				132,
+				133,
+				135,
+				136,
+				137,
+				138,
+				139,
+				140,
+				142,
+				143,
+				145,
+				146,
+				147,
+				148,
+				149,
+				151,
+				153,
+				154,
+				155,
+				157,
+				159,
+				160
+			]
+		},
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				2,
+				4,
+				6,
+				9,
+				11,
+				13,
+				14,
+				15,
+				17,
+				18,
+				20,
+				22,
+				25,
+				27,
+				29,
+				33,
+				36,
+				38,
+				42,
+				46,
+				49,
+				51,
+				53,
+				56,
+				58,
+				60,
+				62,
+				67,
+				69,
+				70,
+				72,
+				74,
+				76,
+				78,
+				80,
+				82,
+				85,
+				87,
+				90,
+				92,
+				94,
+				96,
+				98,
+				100,
+				102,
+				104,
+				106,
+				108,
+				110,
+				112,
+				114,
+				116,
+				121,
+				123,
+				125,
+				128,
+				134,
+				141,
+				144,
+				150,
+				152,
+				156,
+				158,
+				162
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 2,
+			"path" : "src/CMakeLists.txt",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/binary_sensor/automation.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/binary_sensor/automation.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/binary_sensor/binary_sensor.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/binary_sensor/binary_sensor.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/binary_sensor/filter.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/binary_sensor/filter.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/button/automation.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/button/button.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/button/button.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/deep_sleep/deep_sleep_component.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/deep_sleep/deep_sleep_component.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/deep_sleep/deep_sleep_esp32.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/esp32/core.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/esp32/gpio.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/esp32/gpio.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/esp32/helpers.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/esp32/preferences.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/esp32/preferences.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/esp32_rmt_led_strip/led_strip.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/esp32_rmt_led_strip/led_strip.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/factory_reset/switch/factory_reset_switch.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/factory_reset/switch/factory_reset_switch.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/globals/globals_component.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/gpio/binary_sensor/gpio_binary_sensor.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/gpio/binary_sensor/gpio_binary_sensor.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/gpio/switch/gpio_switch.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/gpio/switch/gpio_switch.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/i2c/i2c.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/i2c/i2c.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/i2c/i2c_bus.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/i2c/i2c_bus_arduino.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/i2c/i2c_bus_esp_idf.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/i2c/i2c_bus_esp_idf.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/i2c/i2c_bus_zephyr.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/ledc/ledc_output.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/ledc/ledc_output.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/light/addressable_light.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/addressable_light.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/addressable_light_effect.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/addressable_light_wrapper.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/light/automation.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/automation.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/base_light_effects.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/color_mode.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/light/esp_color_correction.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/esp_color_correction.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/esp_color_view.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/light/esp_hsv_color.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/esp_hsv_color.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/light/esp_range_view.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/esp_range_view.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/light/light_call.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/light_call.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/light_color_values.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/light/light_effect.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/light_effect.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/light/light_json_schema.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/light_json_schema.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/light/light_output.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/light_output.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/light/light_state.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/light_state.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/light_traits.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/light_transformer.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/light/transformers.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/logger/logger.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/logger/logger.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/logger/logger_esp32.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/logger/task_log_buffer.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/logger/task_log_buffer.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/max17048/max17048.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/max17048/max17048.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/number/automation.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/number/automation.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/number/number.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/number/number.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/number/number_call.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/number/number_call.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/number/number_traits.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/number/number_traits.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/output/automation.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/output/automation.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/output/binary_output.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/output/float_output.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/output/float_output.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/partition/light_partition.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/partition/light_partition.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/preferences/syncer.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/restart/button/restart_button.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/restart/button/restart_button.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/rtttl/rtttl.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/rtttl/rtttl.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/sensor/automation.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/sensor/automation.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/sensor/filter.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/sensor/filter.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/sensor/sensor.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/sensor/sensor.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/switch/automation.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/switch/automation.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/switch/switch.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/switch/switch.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/template/number/template_number.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/template/number/template_number.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/template/switch/template_switch.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/template/switch/template_switch.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/zigbee/automation.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/zigbee/automation.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/zigbee/zigbee.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/zigbee/zigbee.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/components/zigbee/zigbee_attribute.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/zigbee/zigbee_attribute.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 1,
+			"path" : "src/esphome/components/zigbee/zigbee_helpers.c",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/components/zigbee/zigbee_helpers.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/application.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/application.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/area.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/automation.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/base_automation.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/color.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/color.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/component.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/component.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/component_iterator.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/component_iterator.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/controller.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/controller_registry.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/controller_registry.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/datatypes.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/defines.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/device.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/doxygen.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/entity_base.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/entity_base.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/event_pool.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/finite_set_mask.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/gpio.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/hal.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/hash_base.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/helpers.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/helpers.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/lock_free_queue.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/log.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/log.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/log_const_en.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/macros.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/optional.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/preferences.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/ring_buffer.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/ring_buffer.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/scheduler.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/scheduler.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/string_ref.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/template_lambda.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/time.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/time.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/esphome/core/util.cpp",
+			"sourceGroupIndex" : 2
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/util.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/esphome/core/version.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 2,
+			"path" : "src/idf_component.yml",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 2,
+			"compileGroupIndex" : 0,
+			"path" : "src/main.cpp",
+			"sourceGroupIndex" : 2
+		}
+	],
+	"type" : "STATIC_LIBRARY"
+}

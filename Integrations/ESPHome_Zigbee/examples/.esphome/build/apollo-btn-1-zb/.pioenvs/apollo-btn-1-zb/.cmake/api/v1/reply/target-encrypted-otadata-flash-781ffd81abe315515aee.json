@@ -1,0 +1,82 @@
+{
+	"backtrace" : 3,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_custom_target",
+			"fail_target",
+			"esptool_py_flash_target"
+		],
+		"files" : 
+		[
+			"/Users/justinapollo/.platformio/packages/framework-espidf/tools/cmake/utilities.cmake",
+			"/Users/justinapollo/.platformio/packages/framework-espidf/components/esptool_py/project_include.cmake",
+			"/Users/justinapollo/.platformio/packages/framework-espidf/components/app_update/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 2
+			},
+			{
+				"command" : 2,
+				"file" : 2,
+				"line" : 70,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 503,
+				"parent" : 1
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 239,
+				"parent" : 2
+			}
+		]
+	},
+	"id" : "encrypted-otadata-flash::@cc3b426666063acc9674",
+	"name" : "encrypted-otadata-flash",
+	"paths" : 
+	{
+		"build" : "esp-idf/app_update",
+		"source" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/app_update"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"name" : "CMake Rules",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 3,
+			"isGenerated" : true,
+			"path" : ".pioenvs/apollo-btn-1-zb/esp-idf/app_update/CMakeFiles/encrypted-otadata-flash",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : ".pioenvs/apollo-btn-1-zb/esp-idf/app_update/CMakeFiles/encrypted-otadata-flash.rule",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "UTILITY"
+}

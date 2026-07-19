@@ -81,13 +81,19 @@
     <div class="content">
       <h1>Apollo BTN-1 Installer</h1>
       
-      <div class="button-row" style="display: flex; justify-content: center; gap: 20px; align-items: center;">
-        <div>
-          <p>Firmware</p>
+      <div class="button-row" style="display: flex; justify-content: center; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
+        <div style="text-align: center;">
+          <h3>WiFi (ESPHome)</h3>
+          <p>Standard firmware with WiFi connectivity</p>
           <esp-web-install-button manifest="./firmware/manifest.json"></esp-web-install-button>
         </div>
-  
-    </div>
+        <div style="text-align: center;">
+          <h3>Zigbee (Beta)</h3>
+          <p>Native Zigbee for ZHA/Zigbee2MQTT</p>
+          <esp-web-install-button manifest="./firmware-zb/manifest.json"></esp-web-install-button>
+          <p style="font-size: 0.85em; color: #f39c12; margin-top: 8px;">Requires flash erase for first install</p>
+        </div>
+      </div>
       <div class="footer">
         <a href="https://github.com/ApolloAutomation/BTN-1"
           >Apollo BTN-1</a

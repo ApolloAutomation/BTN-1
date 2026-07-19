@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "esp-idf/newlib/src/port",
+		"source" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/newlib/src/port"
+	}
+}

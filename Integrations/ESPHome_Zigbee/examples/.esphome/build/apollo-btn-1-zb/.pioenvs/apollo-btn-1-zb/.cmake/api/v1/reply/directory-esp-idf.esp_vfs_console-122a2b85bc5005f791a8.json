@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "esp-idf/esp_vfs_console",
+		"source" : "/Users/justinapollo/.platformio/packages/framework-espidf/components/esp_vfs_console"
+	}
+}

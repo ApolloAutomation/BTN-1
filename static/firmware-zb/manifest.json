@@ -1,0 +1,13 @@
+{
+  "name": "Apollo BTN-1 Zigbee",
+  "version": "1.0.0-beta",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32-C6",
+      "parts": [
+        { "path": "apollo-btn-1-zigbee.bin", "offset": 0 }
+      ]
+    }
+  ]
+}
