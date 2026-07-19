@@ -1,0 +1,28 @@
+BTN-1 Zigbee signature AFTER the 26.7.19.1-zigbee rework, Zigbee2MQTT variant
+(read from the generated build)
+
+Manufacturer:    Apollo Automation
+Model:           BTN-1-Z2M
+ApplicationVersion 1, DateCode 20260719, PowerSource 3 (battery)
+Role: end device (declared through the component)
+
+EP 1  CUSTOM_ATTR           Basic, Identify, BinaryInput(presentValue, description "Button 1"),
+                            MultistateInput(presentValue action 1..4, numberOfStates 5),
+                            PowerConfiguration(BatteryVoltage 0x0020, BatteryPercentageRemaining 0x0021)
+EP 2  CUSTOM_ATTR           BinaryInput + MultistateInput, Button 2
+EP 3  CUSTOM_ATTR           BinaryInput + MultistateInput, Button 3
+EP 4  CUSTOM_ATTR           BinaryInput + MultistateInput, Button 4
+EP 5  COLOR_DIMMABLE_LIGHT  Basic, Identify, Groups, Scenes, OnOff, LevelControl, ColorControl(XY)  BTN 1 Light
+EP 6  COLOR_DIMMABLE_LIGHT  same  BTN 2 Light
+EP 7  COLOR_DIMMABLE_LIGHT  same  BTN 3 Light
+EP 8  COLOR_DIMMABLE_LIGHT  same  BTN 4 Light
+
+Action values: 1 single, 2 double, 3 triple, 4 hold. State and action
+attributes force-report individually. Retired: Prevent Sleep endpoint,
+AnalogInput battery endpoints.
+
+Diff vs BEFORE: model string gains the stack suffix; buttons move from
+EP8-11 to EP1-4 and gain MultistateInput; lights move from EP1-4 to
+EP5-8; EP5-7 retired; battery becomes a standard PowerConfiguration
+cluster on EP1; endpoint count 11 -> 8. Every change requires re-pairing;
+entities are re-created under the new layout.
