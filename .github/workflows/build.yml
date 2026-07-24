@@ -16,7 +16,7 @@ on:
 
 jobs:
   build-and-publish:
-    uses: ApolloAutomation/Workflows/.github/workflows/build.yml@main
+    uses: ApolloAutomation/Workflows/.github/workflows/build.yml@430d90dc695c6f7d1075c4e4a0df4b13a6496252 # main 2026-07-23
     permissions:
       contents: write
       pages: write
@@ -24,9 +24,13 @@ jobs:
       pull-requests: write
     with:
       device-name: btn-1
+      # BTN-1_Minimal.yaml is the end-user image served at firmware/ (OTA
+      # updates and dashboard adoption). BTN-1.yaml (improv + BLE) is only
+      # used for first flashes via the web installer.
       yaml-files: |
+        Integrations/ESPHome/BTN-1_Minimal.yaml
         Integrations/ESPHome/BTN-1.yaml
-      firmware-names: "1:firmware"
+      firmware-names: "1_Minimal:firmware,1:firmware-factory"
       core-yaml-path: Integrations/ESPHome/Core.yaml
       esphome-version: stable
       # Bypass check if manually triggered with bypass option
