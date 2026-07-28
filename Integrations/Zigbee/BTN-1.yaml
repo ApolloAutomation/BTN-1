@@ -77,10 +77,12 @@ zigbee:
   power_supply: 3
   router: false
   sleepy: true
-  # Must stay under the Zigbee indirect-message persistence time (~7.7 s),
-  # or commands to the sleeping device expire in the parent's buffer
-  # before the next poll. 5 s keeps a safe margin.
-  keep_alive: 5000
+  # Must stay well under the parent's indirect-message buffer window or
+  # commands to the sleeping device expire before the next poll. 3 s is
+  # the bench-proven value against the ZBT-2 coordinator; 5 s already
+  # showed delivery misses there. Investigate the coordinator's
+  # indirect-transmission timeout before raising this.
+  keep_alive: 3000
   on_join:
     then:
       - logger.log:
