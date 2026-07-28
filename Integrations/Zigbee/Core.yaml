@@ -103,17 +103,12 @@ binary_sensor:
     name: "Button 1"
     pin:
       number: GPIO2
+      allow_other_uses: true
       mode:
         input: true
         pulldown: true
     filters:
       - delayed_off: 10ms
-    on_press:
-      then:
-        - zigbee.reportAttr: btn1_state
-    on_release:
-      then:
-        - zigbee.reportAttr: btn1_state
     on_multi_click:
       - timing:
           - ON for at most 300ms
@@ -162,17 +157,12 @@ binary_sensor:
     name: "Button 2"
     pin:
       number: GPIO4
+      allow_other_uses: true
       mode:
         input: true
         pulldown: true
     filters:
       - delayed_off: 10ms
-    on_press:
-      then:
-        - zigbee.reportAttr: btn2_state
-    on_release:
-      then:
-        - zigbee.reportAttr: btn2_state
     on_multi_click:
       - timing:
           - ON for at most 300ms
@@ -221,17 +211,12 @@ binary_sensor:
     name: "Button 3"
     pin:
       number: GPIO6
+      allow_other_uses: true
       mode:
         input: true
         pulldown: true
     filters:
       - delayed_off: 10ms
-    on_press:
-      then:
-        - zigbee.reportAttr: btn3_state
-    on_release:
-      then:
-        - zigbee.reportAttr: btn3_state
     on_multi_click:
       - timing:
           - ON for at most 300ms
@@ -280,17 +265,12 @@ binary_sensor:
     name: "Button 4"
     pin:
       number: GPIO5
+      allow_other_uses: true
       mode:
         input: true
         pulldown: true
     filters:
       - delayed_off: 10ms
-    on_press:
-      then:
-        - zigbee.reportAttr: btn4_state
-    on_release:
-      then:
-        - zigbee.reportAttr: btn4_state
     on_multi_click:
       - timing:
           - ON for at most 300ms
@@ -339,7 +319,7 @@ binary_sensor:
 sensor:
   - platform: max17048
     id: max_17048
-    update_interval: 300s
+    update_interval: 600s
     battery_voltage:
       name: "Battery voltage"
       id: batt_v
@@ -354,9 +334,38 @@ sensor:
             return x;
 
 # ============================================
+# Storage mode deep sleep (opt-in only; no timers, no run_duration)
+# ============================================
+deep_sleep:
+  id: deep_sleep_storage
+  esp32_ext1_wakeup:
+    mode: ANY_HIGH
+    pins:
+      - number: GPIO2
+        allow_other_uses: true
+      - number: GPIO4
+        allow_other_uses: true
+      - number: GPIO5
+        allow_other_uses: true
+      - number: GPIO6
+        allow_other_uses: true
+
+# ============================================
 # Power rails (hardware control, always on)
 # ============================================
 switch:
+  # Storage Mode: deep sleep until a button is pressed. Exposed over
+  # Zigbee on endpoint 9. ALWAYS_OFF so every boot starts awake.
+  - platform: template
+    name: "Storage Mode"
+    id: storage_mode
+    entity_category: config
+    optimistic: true
+    restore_mode: ALWAYS_OFF
+    on_turn_on:
+      then:
+        - script.execute: storage_mode_enter
+
   - platform: gpio
     pin: GPIO19
     name: "Power Latch"
@@ -429,6 +438,23 @@ light:
 # Local feedback scripts
 # ============================================
 script:
+  # Storage mode entry: descending chirp, LEDs off, rails held, sleep.
+  # The delay lets the chirp finish and the switch state report leave.
+  - id: storage_mode_enter
+    mode: single
+    then:
+      - logger.log:
+          level: INFO
+          format: "Storage mode: deep sleeping until a button is pressed"
+      - light.turn_off: rgb_light
+      - rtttl.play: "storage:d=16,o=6,b=140:g,e,c"
+      - delay: 1500ms
+      - lambda: |-
+          global_preferences->sync();
+          gpio_hold_en((gpio_num_t) 19);
+          gpio_hold_en((gpio_num_t) 18);
+      - deep_sleep.enter: deep_sleep_storage
+
   # Green flash and a short chirp when the device joins a Zigbee network
   - id: join_feedback
     mode: restart
@@ -488,29 +514,25 @@ script:
                 then:
                   - zigbee.setAttr:
                       id: btn1_action
-                      value: !lambda 'return action;'
-                  - zigbee.reportAttr: btn1_action
+                      value: !lambda 'return action;' 
             - if:
                 condition:
                   lambda: 'return button == 2;'
                 then:
                   - zigbee.setAttr:
                       id: btn2_action
-                      value: !lambda 'return action;'
-                  - zigbee.reportAttr: btn2_action
+                      value: !lambda 'return action;' 
             - if:
                 condition:
                   lambda: 'return button == 3;'
                 then:
                   - zigbee.setAttr:
                       id: btn3_action
-                      value: !lambda 'return action;'
-                  - zigbee.reportAttr: btn3_action
+                      value: !lambda 'return action;' 
             - if:
                 condition:
                   lambda: 'return button == 4;'
                 then:
                   - zigbee.setAttr:
                       id: btn4_action
-                      value: !lambda 'return action;'
-                  - zigbee.reportAttr: btn4_action
+                      value: !lambda 'return action;' 

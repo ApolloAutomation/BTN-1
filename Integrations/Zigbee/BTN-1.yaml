@@ -22,7 +22,7 @@ esphome:
   name: apollo-btn-1-zb
   friendly_name: "Apollo BTN-1 Zigbee"
   comment: ${device_description}
-  min_version: 2026.3.0
+  min_version: 2026.7.0
   project:
     name: "apollo_automation.btn-1-zigbee"
     version: ${version}
@@ -46,9 +46,18 @@ esp32:
 # not by manual sdkconfig flags: manual CONFIG_ZB_ZCZR/ZED entries are silently
 # overridden by the component and must not be added here.
 external_components:
-  - source: github://luar123/zigbee_esphome@98b54b83ab080628e661b8a28b8b03b6c3bc38bd
+  # v1.x tip: newest ZBOSS-line commit; sleepy end device support.
+  # Requires ESPHome 2026.7.x (see the toolchain note in the header).
+  - source: github://luar123/zigbee_esphome@6e3d54975f318f9c11fb325e7a031274b629ecad
     refresh: never
     components: [zigbee]
+  # Vendored snapshot of ESPHome PR 12325 (power_management, rwrozelle,
+  # commit a8fb16dccf33cd11f5b384745577ed9ef84dcc3c). Remove when the PR
+  # merges into an ESPHome release.
+  - source:
+      type: local
+      path: components
+    components: [power_management]
   - source: github://ApolloAutomation/esphome-battery-component@2f24e89a2a4bb02cda63ab074585904cd58247c4
     refresh: never
     components: [max17048]
@@ -67,6 +76,11 @@ zigbee:
   date: "20260719"
   power_supply: 3
   router: false
+  sleepy: true
+  # Must stay under the Zigbee indirect-message persistence time (~7.7 s),
+  # or commands to the sleeping device expire in the parent's buffer
+  # before the next poll. 5 s keeps a safe margin.
+  keep_alive: 5000
   on_join:
     then:
       - logger.log:
@@ -84,7 +98,7 @@ zigbee:
               attribute_id: 0x55
               type: BOOL
               value: false
-              report: false
+              report: force
               device: button_1
             - attribute_id: 0x51
               id: btn1_bi_oos
@@ -105,7 +119,7 @@ zigbee:
               attribute_id: 0x55
               type: U16
               value: 0
-              report: false
+              report: force
             - attribute_id: 0x4A
               id: btn1_ms_states
               type: U16
@@ -149,7 +163,7 @@ zigbee:
               attribute_id: 0x55
               type: BOOL
               value: false
-              report: false
+              report: force
               device: button_2
             - attribute_id: 0x51
               id: btn2_bi_oos
@@ -170,7 +184,7 @@ zigbee:
               attribute_id: 0x55
               type: U16
               value: 0
-              report: false
+              report: force
             - attribute_id: 0x4A
               id: btn2_ms_states
               type: U16
@@ -198,7 +212,7 @@ zigbee:
               attribute_id: 0x55
               type: BOOL
               value: false
-              report: false
+              report: force
               device: button_3
             - attribute_id: 0x51
               id: btn3_bi_oos
@@ -219,7 +233,7 @@ zigbee:
               attribute_id: 0x55
               type: U16
               value: 0
-              report: false
+              report: force
             - attribute_id: 0x4A
               id: btn3_ms_states
               type: U16
@@ -247,7 +261,7 @@ zigbee:
               attribute_id: 0x55
               type: BOOL
               value: false
-              report: false
+              report: force
               device: button_4
             - attribute_id: 0x51
               id: btn4_bi_oos
@@ -268,7 +282,7 @@ zigbee:
               attribute_id: 0x55
               type: U16
               value: 0
-              report: false
+              report: force
             - attribute_id: 0x4A
               id: btn4_ms_states
               type: U16
@@ -419,9 +433,30 @@ zigbee:
               type: 16BITMAP
               value: 8
 
+    # Storage Mode: opt-in deep sleep for maximum battery life.
+    # Turning the switch on puts the device into deep sleep until any of
+    # the four buttons is pressed. The waking press only wakes; the device
+    # rejoins within a few seconds and following presses register.
+    - device_type: ON_OFF_OUTPUT
+      num: 9
+      clusters:
+        - id: ON_OFF
+          attributes:
+            - attribute_id: 0x0
+              type: BOOL
+              value: false
+              report: true
+              device: storage_mode
+
 # Hardware configuration
 packages:
   hardware: !include Core.yaml
+
+# Power management: light sleep between Zigbee keep-alive polls
+power_management:
+  enable_light_sleep: true
+  power_down_peripherals: true
+  power_down_flash: true
 
 # Logging (serial only, no Wi-Fi in this firmware)
 logger:
