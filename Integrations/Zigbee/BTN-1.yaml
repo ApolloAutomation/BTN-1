@@ -435,7 +435,7 @@ zigbee:
               type: 16BITMAP
               value: 8
 
-    # Storage Mode: opt-in deep sleep for maximum battery life.
+    # Deep Sleep Mode: opt-in deep sleep for maximum battery life.
     # Turning the switch on puts the device into deep sleep until any of
     # the four buttons is pressed. The waking press only wakes; the device
     # rejoins within a few seconds and following presses register.

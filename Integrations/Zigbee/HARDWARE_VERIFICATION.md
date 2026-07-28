@@ -55,4 +55,4 @@ Found and fixed during the session: stuck button states from the component's spl
 
 Lessons recorded: ZHA caches endpoint layouts, so firmware endpoint changes need remove-and-re-pair, not reset; a nearby network with permit join open will steal devices during commissioning (one join went to an unidentified foreign network before succeeding here); the USB console disappears in light sleep, so bench logging requires a non-sleepy diagnostic build.
 
-Remaining, in priority order: storage mode entry, wake press, and post-wake rejoin; click actions end to end with the quirk installed; duplicate-action observation window; idle current in normal and storage modes (meter); multi-day battery drain; Z2M variant of the sleepy work; coordinator indirect-timeout measurement before any keep-alive increase.
+Remaining, in priority order: deep sleep mode entry, wake press, and post-wake rejoin; click actions end to end with the quirk installed; duplicate-action observation window; idle current in normal and deep sleep modes (meter); multi-day battery drain; Z2M variant of the sleepy work; coordinator indirect-timeout measurement before any keep-alive increase.

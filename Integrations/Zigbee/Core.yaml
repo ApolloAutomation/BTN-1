@@ -357,7 +357,7 @@ switch:
   # Storage Mode: deep sleep until a button is pressed. Exposed over
   # Zigbee on endpoint 9. ALWAYS_OFF so every boot starts awake.
   - platform: template
-    name: "Storage Mode"
+    name: "Deep Sleep Mode"
     id: storage_mode
     entity_category: config
     optimistic: true
@@ -433,6 +433,24 @@ light:
       - id: rgb_light
         from: 3
         to: 3
+
+# ============================================
+# Button state resync
+# A single lost radio frame must not leave a stale button state at the
+# coordinator (each edge transmits exactly once). Re-reporting the four
+# states every 30 seconds heals any loss; state reports are idempotent.
+# ============================================
+interval:
+  - interval: 30s
+    then:
+      - if:
+          condition:
+            lambda: 'return id(zb).is_connected();'
+          then:
+            - zigbee.reportAttr: btn1_state
+            - zigbee.reportAttr: btn2_state
+            - zigbee.reportAttr: btn3_state
+            - zigbee.reportAttr: btn4_state
 
 # ============================================
 # Local feedback scripts
