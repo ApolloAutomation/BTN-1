@@ -78,3 +78,20 @@ Pinned commit 98b54b8 is the newest v1.x commit compatible with ESPHome 2026.3.x
 ## Change summary for the wiki
 
 The BTN-1 Zigbee firmware was rebuilt around a fixed endpoint map. Buttons now deliver single, double, and triple clicks plus hold as Zigbee events with the same timing behavior as the Wi-Fi firmware, battery reporting moved to the standard Zigbee battery cluster, and each variant identifies itself by stack (BTN-1-ZHA or BTN-1-Z2M) so the matching quirk or converter applies cleanly. The reset button gained a real factory reset that clears Zigbee network data, and the pairing gesture is a 5 to 10 second hold. Deep sleep was removed: the previous firmware advertised it but shipped with it disabled, and the Zigbee component cannot yet run as a sleepy end device, so USB-C power is the intended mode. External component versions are pinned for reproducible builds. This firmware is available to flash for advanced users; it is not the main BTN-1 firmware.
+
+## Sleepy operation (this branch)
+
+This branch turns the BTN-1 into a true sleepy end device. Verified on hardware 2026-07-28 against a Home Assistant Connect ZBT-2 coordinator; everything below reflects measured behavior, not theory.
+
+- Power model: light sleep between keep-alive polls, radio parked, RAM retained. Button presses wake the chip by GPIO interrupt and register immediately. The USB serial console is unavailable while sleeping; plan support workflows around Zigbee-side diagnostics.
+- keep_alive is 3000 ms and must stay well under the parent's indirect-message buffer window. The spec persistence time is about 7.7 s, but the bench showed 5000 ms already missing deliveries on the ZBT-2, and 10000 ms failing almost always (commands only arrived when a button press forced a poll). Measure the coordinator's indirect transmission timeout before ever raising this value.
+- Measured command latency at 3000 ms polls: 3 to 5 seconds from Home Assistant action to device-confirmed state, eight of eight commands delivered, four-command burst delivered in order with the correct final state.
+- Color fidelity through the on-device XY conversion: red exact, white and amber within 1/255 per channel on readback.
+- Battery: fuel gauge tracks charging live (23 to 39 percent across the bench session on USB power); the reporting engine pushed the change to Home Assistant without polling.
+- Storage Mode (endpoint 9): opt-in deep sleep at microamp draw. One press wakes it; that press only wakes, the rejoin is silent, following presses register. Not yet exercised on hardware; it is the first item on the remaining checklist.
+- Report atomicity: button state and action attributes use the component's force path, which reports inside the same lock hold as the value write. The split set/report deferral in the component can otherwise transmit a stale value under sleepy lock contention (observed as a stuck pressed state); see UPSTREAM_ISSUES.md item 1.
+- Endpoint changes require a full re-pair, not a reset: ZHA reuses its cached endpoint layout for a known device on rejoin. Remove the device in ZHA (zha.remove), keep permit join open, and let it rejoin fresh; a reset alone will not surface new endpoints.
+- Identify: confirmed a silent no-op on hardware (no error, no blink), as documented.
+- Toolchain: ESPHome 2026.7.x plus the vendored power_management snapshot under components/. See the WIP commit message for the venv recipe.
+
+Still unverified on hardware: the click actions end to end (single, double, triple, hold need the quirk installed or an upstream quirk to be observable in ZHA), duplicate-action watch, storage mode entry and wake, battery current measurements, and everything on the Z2M side of the sleepy work.

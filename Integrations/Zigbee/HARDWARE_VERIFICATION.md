@@ -46,3 +46,13 @@ Nothing in firmware 26.7.19.1-zigbee has run on a device. Compilation and code r
 ## H. Regression comparison (informational)
 
 21. Pair the old released binary (releases/apollo-btn-1-zigbee.bin) on a spare unit and confirm the failure modes the audit predicted (converter dead, battery absent in Z2M, factory reset leaving credentials). Useful for support conversations with existing flashers; skip if no spare unit.
+
+## Bench session results, 2026-07-28 (sleepy WIP build)
+
+Passed: flash and boot, fresh-join interview with all nine endpoints, silent NVRAM rejoin after reflash, raw button press and release in Home Assistant, all four lights with color set and readback, command delivery at 3 s keep-alive (3 to 5 s latency, zero losses, ordered burst delivery), battery percentage and voltage including live charge tracking and engine-driven reports, factory reset and Zigbee reset tiers, remote attribute reads, ZHA reconfigure without error, Identify confirmed as harmless no-op.
+
+Found and fixed during the session: stuck button states from the component's split set/report lock race (now atomic force reports); command delivery misses at 5 s and 10 s keep-alive against the ZBT-2 (parent buffer window; pinned at 3 s pending a coordinator-timeout measurement).
+
+Lessons recorded: ZHA caches endpoint layouts, so firmware endpoint changes need remove-and-re-pair, not reset; a nearby network with permit join open will steal devices during commissioning (one join went to an unidentified foreign network before succeeding here); the USB console disappears in light sleep, so bench logging requires a non-sleepy diagnostic build.
+
+Remaining, in priority order: storage mode entry, wake press, and post-wake rejoin; click actions end to end with the quirk installed; duplicate-action observation window; idle current in normal and storage modes (meter); multi-day battery drain; Z2M variant of the sleepy work; coordinator indirect-timeout measurement before any keep-alive increase.
