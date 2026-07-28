@@ -20,6 +20,8 @@ substitutions:
 
 esphome:
   name: apollo-btn-1-zb
+  includes:
+    - apollo_poll_control.h
   friendly_name: "Apollo BTN-1 Zigbee"
   comment: ${device_description}
   min_version: 2026.7.0
@@ -89,6 +91,7 @@ zigbee:
           level: INFO
           format: "Zigbee network joined"
       - script.execute: join_feedback
+      - script.execute: apply_poll_mode
   endpoints:
     # Button 1 + battery
     - device_type: CUSTOM_ATTR
@@ -449,6 +452,19 @@ zigbee:
               value: false
               report: true
               device: storage_mode
+
+    # Instant Response: fast polling (500 ms) for USB powered use.
+    # Trades battery for latency; off by default.
+    - device_type: ON_OFF_OUTPUT
+      num: 10
+      clusters:
+        - id: ON_OFF
+          attributes:
+            - attribute_id: 0x0
+              type: BOOL
+              value: false
+              report: true
+              device: instant_response
 
 # Hardware configuration
 packages:

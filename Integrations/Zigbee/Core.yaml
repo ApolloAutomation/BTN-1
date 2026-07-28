@@ -334,7 +334,7 @@ sensor:
             return x;
 
 # ============================================
-# Storage mode deep sleep (opt-in only; no timers, no run_duration)
+# Deep sleep mode (opt-in only; no timers, no run_duration)
 # ============================================
 deep_sleep:
   id: deep_sleep_storage
@@ -354,7 +354,7 @@ deep_sleep:
 # Power rails (hardware control, always on)
 # ============================================
 switch:
-  # Storage Mode: deep sleep until a button is pressed. Exposed over
+  # Deep Sleep Mode: deep sleep until a button is pressed. Exposed over
   # Zigbee on endpoint 9. ALWAYS_OFF so every boot starts awake.
   - platform: template
     name: "Deep Sleep Mode"
@@ -365,6 +365,22 @@ switch:
     on_turn_on:
       then:
         - script.execute: storage_mode_enter
+
+  # Instant Response: poll the parent every 500 ms instead of every 3 s,
+  # for USB powered use. Exposed over Zigbee on endpoint 10. Off by
+  # default; costs battery when on.
+  - platform: template
+    name: "Instant Response"
+    id: instant_response
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      then:
+        - script.execute: apply_poll_mode
+    on_turn_off:
+      then:
+        - script.execute: apply_poll_mode
 
   - platform: gpio
     pin: GPIO19
@@ -451,6 +467,8 @@ interval:
             - zigbee.reportAttr: btn2_state
             - zigbee.reportAttr: btn3_state
             - zigbee.reportAttr: btn4_state
+            # Poll mode survives silent NVRAM rejoins via this reapply
+            - script.execute: apply_poll_mode
 
 # ============================================
 # Local feedback scripts
@@ -472,6 +490,18 @@ script:
           gpio_hold_en((gpio_num_t) 19);
           gpio_hold_en((gpio_num_t) 18);
       - deep_sleep.enter: deep_sleep_storage
+
+  # Apply the poll interval for the current Instant Response state.
+  # Safe only while joined; the stack owns the poll timer.
+  - id: apply_poll_mode
+    mode: queued
+    then:
+      - if:
+          condition:
+            lambda: 'return id(zb).is_connected();'
+          then:
+            - lambda: |-
+                apollo_set_poll_interval(id(instant_response).state ? 500 : 3000);
 
   # Green flash and a short chirp when the device joins a Zigbee network
   - id: join_feedback
