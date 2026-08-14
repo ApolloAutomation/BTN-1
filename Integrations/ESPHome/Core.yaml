@@ -250,6 +250,7 @@ event:
   - platform: template
     id: button_1_event
     name: Button 1
+    device_class: button
     event_types:
       - click
       - double_click
@@ -259,6 +260,7 @@ event:
   - platform: template
     id: button_2_event
     name: Button 2
+    device_class: button
     event_types:
       - click
       - double_click
@@ -268,6 +270,7 @@ event:
   - platform: template
     id: button_3_event
     name: Button 3
+    device_class: button
     event_types:
       - click
       - double_click
@@ -277,6 +280,7 @@ event:
   - platform: template
     id: button_4_event
     name: Button 4
+    device_class: button
     event_types:
       - click
       - double_click
