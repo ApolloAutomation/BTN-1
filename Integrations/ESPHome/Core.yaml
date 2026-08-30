@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "26.7.14.1"
+  version: "26.8.27.1"
 
   device_description: ${name} made by Apollo Automation - version ${version}.
   # Default update channel on first boot (no stored user choice yet, i.e. a
@@ -26,7 +26,7 @@ esphome:
     name: "ApolloAutomation.BTN-1"
     version: "${version}"
 
-  min_version: 2025.11.0
+  min_version: 2026.8.0
 
   # Wake-up detection logic
   on_boot:
@@ -299,6 +299,7 @@ event:
   - platform: template
     id: button_1_event
     name: Button 1
+    device_class: button
     event_types:
       - click
       - double_click
@@ -308,6 +309,7 @@ event:
   - platform: template
     id: button_2_event
     name: Button 2
+    device_class: button
     event_types:
       - click
       - double_click
@@ -317,6 +319,7 @@ event:
   - platform: template
     id: button_3_event
     name: Button 3
+    device_class: button
     event_types:
       - click
       - double_click
@@ -326,6 +329,7 @@ event:
   - platform: template
     id: button_4_event
     name: Button 4
+    device_class: button
     event_types:
       - click
       - double_click
@@ -753,7 +757,7 @@ light:
     default_transition_length: 0s
     chipset: WS2812
     num_leds: 4
-    rgb_order: grb
+    channel_colors: GRB
     internal: true
     effects:
       - pulse:
