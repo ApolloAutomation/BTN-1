@@ -36,3 +36,7 @@ Integrations/.DS_Store
 
 /.esphome/
 /secrets.yaml
+
+# ESPHome build caches anywhere in the tree
+.esphome/
+__pycache__/
