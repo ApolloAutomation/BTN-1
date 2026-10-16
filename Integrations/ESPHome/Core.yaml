@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "26.8.27.1"
+  version: "26.10.16.1"
 
   device_description: ${name} made by Apollo Automation - version ${version}.
 
@@ -15,6 +15,9 @@ esphome:
     version: "${version}"
 
   min_version: 2026.8.0
+
+  includes:
+    - <driver/rtc_io.h>
 
   # Wake-up detection logic
   on_boot:
@@ -38,39 +41,21 @@ esphome:
     - priority: -900
       then:
       - lambda: |-
-          uint64_t wake = esp_sleep_get_ext1_wakeup_status();
-          
-          // Only process deep sleep wake if we actually woke from deep sleep
-          if (wake != 0) {
-            uint32_t low = wake % 0xFFFFFFFF;
-            uint32_t high = (wake >> 32) % 0xFFFFFFFF;
-            
-            ESP_LOGI("Apollo", "Deep sleep wake detected, wake status: 0x%llx", wake);
-            
-            // Check which button caused the wake-up
-            if ((low) & (1<<(2))) {
-              id(wakeup_button_pressed).publish_state("1");
-            }
-            else if ((low) & (1<<(4))) {
-              id(wakeup_button_pressed).publish_state("2");
-            }
-            else if ((low) & (1<<(6))) {
-              id(wakeup_button_pressed).publish_state("3");
-            }
-            else if ((low) & (1<<(5))) {
-              id(wakeup_button_pressed).publish_state("4");
-            }
-            else {
-              id(wakeup_button_pressed).publish_state("0");
-            }
-          }
-          else {
-            // If no deep sleep wake and no button was detected in powered-off scenario
-            // then set to "0" (no button press)
-            if (id(wakeup_button_pressed).state == "") {
-              ESP_LOGI("Apollo", "No wake source detected, setting to 0");
-              id(wakeup_button_pressed).publish_state("0");
-            }
+          // Only a button (ext1) wake counts; timer wakes, resets and power-on report "0"
+          esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+          uint64_t wake = cause == ESP_SLEEP_WAKEUP_EXT1 ? esp_sleep_get_ext1_wakeup_status() : 0;
+          ESP_LOGI("Apollo", "Wake cause: %d, ext1 status: 0x%llx", (int) cause, wake);
+
+          if (wake & (1ULL << 2)) {
+            id(wakeup_button_pressed).publish_state("1");
+          } else if (wake & (1ULL << 4)) {
+            id(wakeup_button_pressed).publish_state("2");
+          } else if (wake & (1ULL << 6)) {
+            id(wakeup_button_pressed).publish_state("3");
+          } else if (wake & (1ULL << 5)) {
+            id(wakeup_button_pressed).publish_state("4");
+          } else {
+            id(wakeup_button_pressed).publish_state("0");
           }
     - priority: -10
       then:
@@ -84,6 +69,20 @@ esphome:
     - light.turn_off: rgb_light
     - switch.turn_off: accessory_power
     - switch.turn_off: power_latch
+    # During deep sleep ext1 hands the button pads to the LP IO mux, which has
+    # its own pull registers. Without this the GPIO pulldowns stop applying,
+    # the pins float, and noise (e.g. while charging) wakes the device as a
+    # phantom button press. See issue #41.
+    # Keeping RTC_PERIPH on is not a power tweak: without it the sleep code
+    # latches the pads instead of keeping the LP pulldowns driven.
+    - lambda: |-
+        esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+        for (gpio_num_t pin : {GPIO_NUM_2, GPIO_NUM_4, GPIO_NUM_5, GPIO_NUM_6}) {
+          rtc_gpio_init(pin);
+          rtc_gpio_set_direction(pin, RTC_GPIO_MODE_INPUT_ONLY);
+          rtc_gpio_pullup_dis(pin);
+          rtc_gpio_pulldown_en(pin);
+        }
 
 api:
   reboot_timeout: 0s
