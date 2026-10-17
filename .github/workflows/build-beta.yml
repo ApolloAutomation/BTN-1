@@ -16,6 +16,11 @@ on:
 permissions:
   contents: read
 
+# Back-to-back beta merges publish in order instead of racing
+concurrency:
+  group: build-beta
+  cancel-in-progress: false
+
 jobs:
   version:
     name: Read version

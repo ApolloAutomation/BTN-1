@@ -4,11 +4,17 @@ substitutions:
   beta_manifest_base: "https://github.com/ApolloAutomation/BTN-1/releases/download/beta-fw"
   ota_stable_manifest: "${stable_manifest_base}/firmware/manifest.json"
   ota_beta_manifest: "${beta_manifest_base}/manifest-standard.json"
+  # Where each channel's firmware lives once its manifest is loaded: Pages
+  # firmware/ for Stable, a standard- release asset for Beta. Matching the
+  # full prefix also rejects one channel's relative path resolved against
+  # the other channel's URL.
+  stable_fw_prefix: "${stable_manifest_base}/firmware/"
+  beta_fw_prefix: "${beta_manifest_base}/standard-"
 
 esphome:
   on_boot:
     # Point update entity at selected manifest. URL only: the Wi-Fi
-    # on_connect check below does the fetch, so a wake costs one request.
+    # on_connect check below does the fetch, so a wake usually costs one request.
     - priority: -100
       then:
         - script.execute: set_ota_source
@@ -87,17 +93,33 @@ select:
     on_value:
       then:
         - script.execute: set_ota_source
-    # Only runs when changed from Home Assistant, not on restore at boot
+    # Only runs when changed from Home Assistant, not on restore at boot.
+    # Runs before the optimistic publish, so current_option() is still the old one.
     set_action:
-      - script.execute: hold_awake_for_update
-      # Let the optimistic publish land (on_value sets the URL) before fetching
-      - delay: 100ms
-      - component.update: update_http_request
+      - if:
+          condition:
+            lambda: 'return !(id(firmware_channel).current_option() == x.c_str());'
+          then:
+            - script.execute: hold_awake_for_update
+            # Let the optimistic publish land (on_value sets the URL) before fetching
+            - delay: 100ms
+            - component.update: update_http_request
+            # The fetch above is dropped if the wake-time check is still running,
+            # and that check then finishes with the old channel's manifest
+            - delay: 8s
+            - lambda: |-
+                const bool beta = id(firmware_channel).current_option() == "Beta";
+                const char *prefix = beta ? "${beta_fw_prefix}" : "${stable_fw_prefix}";
+                if (id(update_http_request).update_info.firmware_url.rfind(prefix, 0) != 0) {
+                  ESP_LOGI("firmware", "Re-fetching manifest for the selected channel");
+                  id(update_http_request).update();
+                }
 
 button:
-  # Renamed: the update: entity already uses that name
+  # Same name as the update entity on purpose: matches the fleet and the
+  # switch-to-beta docs ("Press next to Firmware Update")
   - platform: template
-    name: "Reinstall Firmware"
+    name: "Firmware Update"
     id: update_firmware
     icon: mdi:cloud-download
     entity_category: "config"
@@ -113,9 +135,9 @@ button:
           // A just-woken battery device can miss the fetch; never force-install
           // a manifest left over from the other channel
           const bool beta = id(firmware_channel).current_option() == "Beta";
-          const char *base = beta ? "${beta_manifest_base}" : "${stable_manifest_base}";
-          const std::string fw = id(update_http_request).update_info.firmware_url;
-          if (fw.rfind(base, 0) != 0) {
+          const char *prefix = beta ? "${beta_fw_prefix}" : "${stable_fw_prefix}";
+          const std::string &fw = id(update_http_request).update_info.firmware_url;
+          if (fw.rfind(prefix, 0) != 0) {
             ESP_LOGW("firmware", "Selected channel's manifest not loaded (have '%s'); not installing", fw.c_str());
             return;
           }
@@ -152,7 +174,7 @@ script:
       - script.execute: set_ota_source
       - component.update: update_http_request
 
-  # Keeps the device awake for a channel switch or reinstall: the 10 s
+  # Keeps the device awake for a channel switch or firmware install: the 10 s
   # auto-sleep in Core.yaml checks update_hold. A successful install
   # reboots; otherwise give up after 2 minutes and sleep as normal.
   - id: hold_awake_for_update

@@ -136,10 +136,13 @@ api:
             - lambda: |-
                 id(reportAllValues).execute();
             - delay: 2s
-            # A Reinstall Firmware press can land during the 2 s above
+            # Prevent Sleep, OTA Mode or a Firmware Update press can land during the 2 s above
             - if:
                 condition:
-                  lambda: "return !id(update_hold);"
+                  and:
+                    - lambda: "return !id(update_hold);"
+                    - switch.is_off: prevent_sleep
+                    - binary_sensor.is_off: ota_mode
                 then:
                   - deep_sleep.enter:
                       id: deep_sleep_1
@@ -172,7 +175,7 @@ globals:
     restore_value: no
     initial_value: "0"
   # Set by the firmware channel controls in BTN-1.yaml so the auto-sleep
-  # doesn't cut off a channel switch or reinstall
+  # doesn't cut off a channel switch or firmware install
   - id: update_hold
     type: bool
     restore_value: no
