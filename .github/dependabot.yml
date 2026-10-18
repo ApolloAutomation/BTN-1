@@ -1,6 +1,6 @@
-# Action version pins live in ApolloAutomation/Workflows (reusable workflows
-# referenced @main), so this config normally has nothing to update. It stays
-# as a safety net in case a version-pinned action is added here later.
+# Most action pins live in ApolloAutomation/Workflows (reusable workflows
+# referenced @main). build-beta.yml pins its own actions; Dependabot only
+# reads the default branch, so those bumps arrive once it reaches main.
 version: 2
 updates:
   - package-ecosystem: "github-actions"

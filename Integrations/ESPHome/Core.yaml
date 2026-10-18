@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "26.10.16.1"
+  version: "26.10.16.2"
 
   device_description: ${name} made by Apollo Automation - version ${version}.
 
@@ -127,16 +127,25 @@ api:
             or:
               - binary_sensor.is_on: ota_mode
               - switch.is_on: prevent_sleep
+              - lambda: "return id(update_hold);"
           then:
             - lambda: |- 
-                ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA Or Switch");
+                ESP_LOGW("Apollo", "Preventing Deep Sleep Due To OTA, Switch Or Firmware Update");
                 id(deep_sleep_1).prevent_deep_sleep(); 
           else: 
             - lambda: |-
                 id(reportAllValues).execute();
             - delay: 2s
-            - deep_sleep.enter:
-                id: deep_sleep_1
+            # Prevent Sleep, OTA Mode or a Firmware Update press can land during the 2 s above
+            - if:
+                condition:
+                  and:
+                    - lambda: "return !id(update_hold);"
+                    - switch.is_off: prevent_sleep
+                    - binary_sensor.is_off: ota_mode
+                then:
+                  - deep_sleep.enter:
+                      id: deep_sleep_1
 
 external_components:
   - source: github://ApolloAutomation/esphome-battery-component
@@ -165,6 +174,12 @@ globals:
     type: int
     restore_value: no
     initial_value: "0"
+  # Set by the firmware channel controls in BTN-1.yaml so the auto-sleep
+  # doesn't cut off a channel switch or firmware install
+  - id: update_hold
+    type: bool
+    restore_value: no
+    initial_value: "false"
 
 captive_portal:
   id: captive_portal_instance
@@ -544,7 +559,9 @@ binary_sensor:
       then:
         - if:
             condition:
-              switch.is_off: prevent_sleep
+              and:
+                - switch.is_off: prevent_sleep
+                - lambda: "return !id(update_hold);"
             then:
               - lambda: |-
                   id(deep_sleep_1).allow_deep_sleep();
@@ -595,7 +612,9 @@ switch:
       then:
         - if:
             condition:
-              binary_sensor.is_off: ota_mode
+              and:
+                - binary_sensor.is_off: ota_mode
+                - lambda: "return !id(update_hold);"
             then:
               - lambda: |-
                   id(deep_sleep_1).allow_deep_sleep();

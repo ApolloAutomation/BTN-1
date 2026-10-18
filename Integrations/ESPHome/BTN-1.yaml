@@ -1,3 +1,35 @@
+substitutions:
+  # Manifest bases: stable=Pages, beta=release assets
+  stable_manifest_base: "https://apolloautomation.github.io/BTN-1"
+  beta_manifest_base: "https://github.com/ApolloAutomation/BTN-1/releases/download/beta-fw"
+  ota_stable_manifest: "${stable_manifest_base}/firmware/manifest.json"
+  ota_beta_manifest: "${beta_manifest_base}/manifest-standard.json"
+  # Where each channel's firmware lives once its manifest is loaded: Pages
+  # firmware/ for Stable, a standard- release asset for Beta. Matching the
+  # full prefix also rejects one channel's relative path resolved against
+  # the other channel's URL.
+  stable_fw_prefix: "${stable_manifest_base}/firmware/"
+  beta_fw_prefix: "${beta_manifest_base}/standard-"
+
+esphome:
+  on_boot:
+    # Point update entity at selected manifest. URL only: the Wi-Fi
+    # on_connect check below does the fetch, so a wake usually costs one request.
+    - priority: -100
+      then:
+        - script.execute: set_ota_source
+    # Re-apply Bluetooth Proxy switch after setup
+    - priority: -300
+      then:
+        - if:
+            condition:
+              switch.is_on: bluetooth_proxy_switch
+            then:
+              - esp32_ble_tracker.start_scan:
+                  continuous: true
+            else:
+              - esp32_ble_tracker.stop_scan:
+
 dashboard_import:
   package_import_url: github://ApolloAutomation/BTN-1/Integrations/ESPHome/BTN-1_Minimal.yaml
   import_full_config: false
@@ -7,6 +39,15 @@ improv_serial:
 esp32_improv:
   authorizer: none
 
+esp32_ble_tracker:
+  id: ble_tracker
+  # continuous FALSE on purpose; the switch owns scanning
+  scan_parameters:
+    continuous: false
+
+bluetooth_proxy:
+  id: ble_proxy
+
 ota:
   - platform: esphome
     id: ota_esphome
@@ -15,22 +56,147 @@ ota:
 
 http_request:
   verify_ssl: true
+  # Fits GitHub's ~3.6KB CSP redirect header
+  buffer_size_rx: 5120
+  # Fits GitHub's long signed redirect URL
+  buffer_size_tx: 2048
 
 safe_mode:
 
 update:
   - platform: http_request
-    id: firmware_update
+    id: update_http_request
     name: Firmware Update
-    source: https://apolloautomation.github.io/BTN-1/firmware/manifest.json
+    device_class: firmware
+    source: ${ota_stable_manifest}
 
 wifi:
   on_connect:
-    - component.update: firmware_update
+    - component.update: update_http_request
   ap:
     ssid: "Apollo BTN1 Hotspot"
 
 logger:
+
+select:
+  - platform: template
+    name: "Firmware Channel"
+    id: firmware_channel
+    icon: mdi:source-branch
+    entity_category: "config"
+    optimistic: true
+    restore_value: true
+    options:
+      - "Stable"
+      - "Beta"
+    initial_option: "Stable"
+    on_value:
+      then:
+        - script.execute: set_ota_source
+    # Only runs when changed from Home Assistant, not on restore at boot.
+    # Runs before the optimistic publish, so current_option() is still the old one.
+    set_action:
+      - if:
+          condition:
+            lambda: 'return !(id(firmware_channel).current_option() == x.c_str());'
+          then:
+            - script.execute: hold_awake_for_update
+            # Let the optimistic publish land (on_value sets the URL) before fetching
+            - delay: 100ms
+            - component.update: update_http_request
+            # The fetch above is dropped if the wake-time check is still running,
+            # and that check then finishes with the old channel's manifest
+            - delay: 8s
+            - lambda: |-
+                const bool beta = id(firmware_channel).current_option() == "Beta";
+                const char *prefix = beta ? "${beta_fw_prefix}" : "${stable_fw_prefix}";
+                if (id(update_http_request).update_info.firmware_url.rfind(prefix, 0) != 0) {
+                  ESP_LOGI("firmware", "Re-fetching manifest for the selected channel");
+                  id(update_http_request).update();
+                }
+
+button:
+  # Same name as the update entity on purpose: matches the fleet and the
+  # switch-to-beta docs ("Press next to Firmware Update")
+  - platform: template
+    name: "Firmware Update"
+    id: update_firmware
+    icon: mdi:cloud-download
+    entity_category: "config"
+    on_press:
+      - script.execute: hold_awake_for_update
+      - logger.log: "Applying firmware update for the selected channel"
+      - delay: 3s
+      - script.execute: apply_ota_source
+      - script.wait: apply_ota_source
+      # Give async manifest fetch time to land
+      - delay: 5s
+      - lambda: |-
+          // A just-woken battery device can miss the fetch; never force-install
+          // a manifest left over from the other channel
+          const bool beta = id(firmware_channel).current_option() == "Beta";
+          const char *prefix = beta ? "${beta_fw_prefix}" : "${stable_fw_prefix}";
+          const std::string &fw = id(update_http_request).update_info.firmware_url;
+          if (fw.rfind(prefix, 0) != 0) {
+            ESP_LOGW("firmware", "Selected channel's manifest not loaded (have '%s'); not installing", fw.c_str());
+            return;
+          }
+          id(update_http_request).perform(true);
+
+switch:
+  # Only proxies while awake; pair with Prevent Sleep
+  - platform: template
+    name: "Bluetooth Proxy"
+    id: bluetooth_proxy_switch
+    icon: mdi:bluetooth
+    entity_category: "config"
+    restore_mode: RESTORE_DEFAULT_OFF
+    optimistic: true
+    on_turn_on:
+      - esp32_ble_tracker.start_scan:
+          continuous: true
+    on_turn_off:
+      - esp32_ble_tracker.stop_scan:
+
+script:
+  - id: set_ota_source
+    # Set OTA manifest from the channel select
+    then:
+      - lambda: |-
+          const bool beta = id(firmware_channel).current_option() == "Beta";
+          // Literals only: since 2026.10 set_source_url keeps the raw pointer
+          const char *url = beta ? "${ota_beta_manifest}" : "${ota_stable_manifest}";
+          ESP_LOGI("firmware", "OTA manifest set to: %s", url);
+          id(update_http_request).set_source_url(url);
+
+  - id: apply_ota_source
+    then:
+      - script.execute: set_ota_source
+      - component.update: update_http_request
+
+  # Keeps the device awake for a channel switch or firmware install: the 10 s
+  # auto-sleep in Core.yaml checks update_hold. A successful install
+  # reboots; otherwise give up after 2 minutes and sleep as normal.
+  - id: hold_awake_for_update
+    mode: restart
+    then:
+      - lambda: |-
+          id(update_hold) = true;
+          id(deep_sleep_1).prevent_deep_sleep();
+      - delay: 2min
+      - lambda: id(update_hold) = false;
+      - if:
+          condition:
+            or:
+              - binary_sensor.is_on: ota_mode
+              - switch.is_on: prevent_sleep
+          then:
+            - logger.log: "Update hold expired; staying awake for OTA mode / Prevent Sleep"
+          else:
+            - logger.log: "Update hold expired; going back to sleep"
+            - lambda: id(deep_sleep_1).allow_deep_sleep();
+            - deep_sleep.enter:
+                id: deep_sleep_1
 
 packages:
   core: !include Core.yaml
