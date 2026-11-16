@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "26.10.16.2"
+  version: "26.11.15.1"
 
   device_description: ${name} made by Apollo Automation - version ${version}.
 
@@ -369,34 +369,34 @@ binary_sensor:
     internal: true
     on_multi_click:
       - timing:
-          - ON for at most 300ms
+          - ON for at most 999ms
           - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_1_event
               event_type: click
       - timing:
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at least 0.2s
         then:
           - event.trigger:
               id: button_1_event
               event_type: double_click
       - timing:
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_1_event
               event_type: triple_click
       - timing:
-          - ON for 1s to 5s
+          - ON for at least 1s
           - OFF for at least 0.5s
         then:
           - event.trigger:
@@ -417,34 +417,34 @@ binary_sensor:
     internal: true
     on_multi_click:
       - timing:
-          - ON for at most 300ms
+          - ON for at most 999ms
           - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_2_event
               event_type: click
       - timing:
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at least 0.2s
         then:
           - event.trigger:
               id: button_2_event
               event_type: double_click
       - timing:
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_2_event
               event_type: triple_click
       - timing:
-          - ON for 1s to 5s
+          - ON for at least 1s
           - OFF for at least 0.5s
         then:
           - event.trigger:
@@ -465,34 +465,34 @@ binary_sensor:
     internal: true
     on_multi_click:
       - timing:
-          - ON for at most 300ms
+          - ON for at most 999ms
           - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_3_event
               event_type: click
       - timing:
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at least 0.2s
         then:
           - event.trigger:
               id: button_3_event
               event_type: double_click
       - timing:
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_3_event
               event_type: triple_click
       - timing:
-          - ON for 1s to 5s
+          - ON for at least 1s
           - OFF for at least 0.5s
         then:
           - event.trigger:
@@ -513,34 +513,34 @@ binary_sensor:
     internal: true
     on_multi_click:
       - timing:
-          - ON for at most 300ms
+          - ON for at most 999ms
           - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_4_event
               event_type: click
       - timing:
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at least 0.2s
         then:
           - event.trigger:
               id: button_4_event
               event_type: double_click
       - timing:
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at most 0.5s
-          - ON for at most 300ms
+          - ON for at most 500ms
           - OFF for at least 0.5s
         then:
           - event.trigger:
               id: button_4_event
               event_type: triple_click
       - timing:
-          - ON for 1s to 5s
+          - ON for at least 1s
           - OFF for at least 0.5s
         then:
           - event.trigger:
