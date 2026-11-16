@@ -18,7 +18,7 @@ permissions:
 
 # Back-to-back beta merges publish in order instead of racing
 concurrency:
-  group: build-beta
+  group: build-beta-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -85,6 +85,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Only beta publishes; runs dispatched on other branches build but never
+          # touch the beta-fw release.
+          if [ "$GITHUB_REF" != "refs/heads/beta" ]; then
+            echo "::notice::Not publishing: this run is on $GITHUB_REF, not beta."
+            exit 0
+          fi
           # Publish unless a newer beta commit changes firmware: that commit has its
           # own queued run, which publishes instead. A re-run of an old build can
           # never roll beta back, and docs-only pushes mid-build don't block it.
@@ -186,6 +192,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Only beta publishes; runs dispatched on other branches build but never
+          # touch the beta-fw release.
+          if [ "$GITHUB_REF" != "refs/heads/beta" ]; then
+            echo "::notice::Not publishing: this run is on $GITHUB_REF, not beta."
+            exit 0
+          fi
           # Publish unless a newer beta commit changes firmware: that commit has its
           # own queued run, which publishes instead. A re-run of an old build can
           # never roll beta back, and docs-only pushes mid-build don't block it.
