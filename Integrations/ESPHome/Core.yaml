@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "26.11.15.1"
+  version: "26.11.15.2"
 
   device_description: ${name} made by Apollo Automation - version ${version}.
 
@@ -14,7 +14,7 @@ esphome:
     name: "ApolloAutomation.BTN-1"
     version: "${version}"
 
-  min_version: 2026.8.0
+  min_version: 2026.10.0
 
   includes:
     - <driver/rtc_io.h>
@@ -85,6 +85,7 @@ esphome:
         }
 
 api:
+  encryption:
   reboot_timeout: 0s
   actions:
     - action: play_buzzer
@@ -180,6 +181,10 @@ globals:
     type: bool
     restore_value: no
     initial_value: "false"
+
+wifi:
+  # Keeps today's no-reboot on lost Wi-Fi; 2026.11 drops the AP exemption
+  reboot_timeout: 0s
 
 captive_portal:
   id: captive_portal_instance
@@ -320,41 +325,39 @@ binary_sensor:
         pullup: true
       ignore_strapping_warning: true
     id: reset_button
-    on_multi_click:
-      - timing:
-          - ON for at least 10s
-        then:
-          # Factory reset (10s hold)
-          - globals.set:
-              id: testCycleCount
-              value: "0"
-          - globals.set:
-              id: runTest
-              value: "true"
-          - switch.turn_on: prevent_sleep
-          - switch.turn_on: factory_reset_switch
-      - timing:
-          - ON for at least 3s
-          - OFF for at least 0.2s
-        then:
-          # Prevent sleep (3s hold)
-          - switch.turn_on: prevent_sleep
-          - lambda: |-
-              id(deep_sleep_1).prevent_deep_sleep();
-      - timing:
-          - ON for at most 1s
-          - OFF for at least 0.2s
-        then:
-          # Short press - run status check then test script
-          - script.execute: statusCheck
-          - delay: 3s
-          - globals.set:
-              id: testCycleCount
-              value: "0"
-          - globals.set:
-              id: runTest
-              value: "true"
-          - script.execute: testScript
+    # Timed on release: tap = status + self-test, 3 s = Prevent Sleep,
+    # 10 s = factory reset
+    on_press:
+      then:
+        - lambda: |-
+            id(button_press_timestamp) = millis();
+    on_release:
+      then:
+        - if:
+            condition:
+              lambda: "return millis() - id(button_press_timestamp) >= 10000;"
+            then:
+              - switch.turn_on: prevent_sleep
+              - switch.turn_on: factory_reset_switch
+            else:
+              - if:
+                  condition:
+                    lambda: "return millis() - id(button_press_timestamp) >= 3000;"
+                  then:
+                    - switch.turn_on: prevent_sleep
+                    - lambda: |-
+                        id(deep_sleep_1).prevent_deep_sleep();
+                  else:
+                    # Tap: show network/HA state, then run the self-test
+                    - script.execute: statusCheck
+                    - delay: 3s
+                    - globals.set:
+                        id: testCycleCount
+                        value: "0"
+                    - globals.set:
+                        id: runTest
+                        value: "true"
+                    - script.execute: testScript
   - platform: gpio
     id: button_1
     name: "Button 1"
