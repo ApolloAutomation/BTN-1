@@ -4,15 +4,10 @@ on:
   pull_request:
 
 permissions:
-  pull-requests: write
-  issues: write
   contents: read
 
+# Label check runs from label-check.yml (pull_request_target, fork-safe).
 jobs:
-  label-check:
-    name: Label Check
-    uses: ApolloAutomation/Workflows/.github/workflows/label-check.yml@main
-
   ci:
     name: CI
     uses: ApolloAutomation/Workflows/.github/workflows/esphome-ci.yml@main
@@ -20,4 +15,3 @@ jobs:
       yaml-files: |
         Integrations/ESPHome/BTN-1.yaml
         Integrations/ESPHome/BTN-1_Minimal.yaml
-

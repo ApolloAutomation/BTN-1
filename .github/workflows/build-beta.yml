@@ -1,0 +1,28 @@
+name: Build and Publish Beta
+
+on:
+  push:
+    branches: [beta]
+    paths:
+      - 'Integrations/ESPHome/**'
+      # A push that only changes this file must rebuild too
+      - '.github/workflows/build-beta.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-beta-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  beta:
+    permissions:
+      contents: write
+    uses: ApolloAutomation/Workflows/.github/workflows/build-beta.yml@main
+    with:
+      # Beta serves OTA updates only, so it builds the end-user image.
+      # Devices fetch manifest-standard.json and standard-* bins.
+      variants: >-
+        [{"key": "standard", "yaml": "Integrations/ESPHome/BTN-1.yaml", "name": "firmware-standard"}]
