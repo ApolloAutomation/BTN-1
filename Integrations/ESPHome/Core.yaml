@@ -1,6 +1,6 @@
 substitutions:
   name: apollo-btn-1
-  version: "26.11.15.2"
+  version: "26.11.17.1"
 
   device_description: ${name} made by Apollo Automation - version ${version}.
 
@@ -14,7 +14,7 @@ esphome:
     name: "ApolloAutomation.BTN-1"
     version: "${version}"
 
-  min_version: 2026.10.0
+  min_version: 2026.10.1
 
   includes:
     - <driver/rtc_io.h>
@@ -348,8 +348,11 @@ binary_sensor:
                     - lambda: |-
                         id(deep_sleep_1).prevent_deep_sleep();
                   else:
-                    # Tap: show network/HA state, then run the self-test
+                    # Tap: show network/HA state, then run the self-test.
+                    # Wait for statusCheck to finish so the self-test LED
+                    # does not overwrite (or get cut off by) the status colour.
                     - script.execute: statusCheck
+                    - script.wait: statusCheck
                     - delay: 3s
                     - globals.set:
                         id: testCycleCount
