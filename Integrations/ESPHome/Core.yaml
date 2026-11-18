@@ -193,8 +193,6 @@ web_server:
   id: web_server_instance
   port: 80
   version: 3
-  # No firmware upload from the device page; the setup hotspot still allows it
-  ota: false
 
 i2c:
   id: i2c_bus
